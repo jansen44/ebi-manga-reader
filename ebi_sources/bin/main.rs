@@ -1,14 +1,12 @@
-use ebi_sources::client::ClientErrors;
-use ebi_sources::opex::client::OpexClient;
+use ebi_sources::opex::Opex;
+use ebi_sources::SourceErrors;
 
 #[tokio::main]
-async fn main() -> Result<(), ClientErrors> {
-    let client = OpexClient::new()?;
+async fn main() -> Result<(), SourceErrors> {
+    let opex = Opex::new()?;
 
-    match client.get_manga_page().await {
-        Err(err) => println!("Something went Wrong! {err}"),
-        Ok(body) => println!("{body}"),
-    };
+    println!("{:?}", Opex::source());
+    println!("{:?}", opex.mangas());
 
     Ok(())
 }
