@@ -22,7 +22,7 @@ impl Opex {
         }
     }
 
-    pub fn mangas(&self) -> Vec<Manga> {
+    pub async fn mangas(&self) -> Vec<Manga> {
         vec![
             Manga {
                 id: 0,
@@ -55,8 +55,8 @@ impl Opex {
         ]
     }
 
-    pub fn manga(&self, id: usize) -> Option<Manga> {
-        let mangas = self.mangas();
+    pub async fn manga(&self, id: usize) -> Option<Manga> {
+        let mangas = self.mangas().await;
         if id >= mangas.len() {
             return None;
         }

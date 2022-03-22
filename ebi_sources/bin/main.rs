@@ -6,7 +6,7 @@ async fn main() -> Result<(), SourceErrors> {
     let opex = Opex::new()?;
 
     println!("{:?}", Opex::source());
-    println!("{:?}", opex.mangas());
+    println!("{:?}", opex.mangas().await);
 
     Ok(())
 }
