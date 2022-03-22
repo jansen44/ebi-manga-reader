@@ -4,9 +4,15 @@ version = "0.1.0"
 edition = "2021"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+[[bin]]
+name = "bin_ebi_sources"
+path = "bin/main.rs"
+
 
 [lib]
 name = "ebi_sources"
 path = "lib/lib.rs"
 
 [dependencies]
+reqwest = "0.11"
+tokio = { version = "1", features = ["rt-multi-thread", "macros"] }
