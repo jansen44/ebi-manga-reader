@@ -1,4 +1,5 @@
 use crate::client::ClientErrors;
+use crate::{Chapter, Manga};
 
 use reqwest::header;
 use reqwest::header::HeaderMap;
@@ -28,15 +29,15 @@ impl OpexClient {
         Ok(headers)
     }
 
-    // ToDo: Receive manga as param and request to right URL
-    pub async fn get_manga_page(&self) -> Result<String, ClientErrors> {
-        let body = self.client.get(BASE_URL).send().await?.text().await?;
+    pub async fn get_manga_page(&self, manga: Manga) -> Result<String, ClientErrors> {
+        let url = format!("{BASE_URL}{}", manga.url);
+        let body = self.client.get(url).send().await?.text().await?;
         Ok(body)
     }
 
-    // ToDo: Receive chapter as param and request to right URL
-    pub async fn get_manga_chapter(&self) -> Result<String, ClientErrors> {
-        let body = self.client.get(BASE_URL).send().await?.text().await?;
+    pub async fn get_manga_chapter(&self, chapter: Chapter) -> Result<String, ClientErrors> {
+        let url = format!("{BASE_URL}{}", chapter.url);
+        let body = self.client.get(url).send().await?.text().await?;
         Ok(body)
     }
 }
