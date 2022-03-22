@@ -1,0 +1,12 @@
+[package]
+name = "ebi_sources"
+version = "0.1.0"
+edition = "2021"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[lib]
+name = "ebi_sources"
+path = "lib/lib.rs"
+
+[dependencies]

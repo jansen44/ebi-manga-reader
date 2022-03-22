@@ -1,0 +1,5 @@
+[workspace]
+members = [
+    "ebi",
+    "ebi_sources"
+]
