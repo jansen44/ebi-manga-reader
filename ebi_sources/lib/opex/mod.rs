@@ -70,4 +70,17 @@ impl Opex {
         let chapters = self.parser.get_chapter_list(manga, page);
         Ok(chapters)
     }
+
+    pub async fn chapter(&self, manga: &Manga, id: usize) -> ClientResult<Option<Chapter>> {
+        let chapters = self.chapters(manga).await?;
+        let mut chapters = chapters.iter();
+
+        let chapter = chapters.find(|chapter| chapter.id == id);
+        if chapter.is_none() {
+            return Ok(None);
+        }
+
+        let chapter = chapter.unwrap();
+        Ok(Some(chapter.to_owned()))
+    }
 }
