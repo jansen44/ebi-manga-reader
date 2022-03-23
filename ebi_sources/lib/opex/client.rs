@@ -32,13 +32,13 @@ impl OpexClient {
         Ok(headers)
     }
 
-    pub async fn get_manga_page(&self, manga: Manga) -> Result<String, ClientErrors> {
+    pub async fn get_manga_web_page(&self, manga: &Manga) -> Result<String, ClientErrors> {
         let url = format!("{}{}", self.base_url, manga.url);
         let body = self.client.get(url).send().await?.text().await?;
         Ok(body)
     }
 
-    pub async fn get_manga_chapter(&self, chapter: Chapter) -> Result<String, ClientErrors> {
+    pub async fn _get_chapter_web_page(&self, chapter: &Chapter) -> Result<String, ClientErrors> {
         let url = format!("{}{}", self.base_url, chapter.url);
         let body = self.client.get(url).send().await?.text().await?;
         Ok(body)

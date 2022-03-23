@@ -1,16 +1,18 @@
-use crate::{Manga, Source, SourceErrors};
+use crate::{client::ClientResult, Chapter, Manga, Source, SourceErrors};
 
 mod client;
 mod parser;
 
 pub struct Opex {
     client: client::OpexClient,
+    parser: parser::Parser,
 }
 
 impl Opex {
     pub fn new() -> Result<Self, SourceErrors> {
         let client = client::OpexClient::new(Opex::source())?;
-        Ok(Self { client })
+        let parser = parser::Parser::new();
+        Ok(Self { client, parser })
     }
 
     pub fn source() -> Source {
@@ -22,8 +24,8 @@ impl Opex {
         }
     }
 
-    pub async fn mangas(&self) -> Vec<Manga> {
-        vec![
+    pub async fn mangas(&self) -> ClientResult<Vec<Manga>> {
+        Ok(vec![
             Manga {
                 id: 0,
                 title: String::from("One Piece"),
@@ -52,14 +54,20 @@ impl Opex {
                 url: String::from("//historias-de-capa"),
                 source_name: Opex::source().name,
             },
-        ]
+        ])
     }
 
-    pub async fn manga(&self, id: usize) -> Option<Manga> {
-        let mangas = self.mangas().await;
+    pub async fn manga(&self, id: usize) -> ClientResult<Option<Manga>> {
+        let mangas = self.mangas().await?;
         if id >= mangas.len() {
-            return None;
+            return Ok(None);
         }
-        Some(mangas[id].clone())
+        Ok(Some(mangas[id].clone()))
+    }
+
+    pub async fn chapters(&self, manga: &Manga) -> ClientResult<Vec<Chapter>> {
+        let page = self.client.get_manga_web_page(manga).await?;
+        let chapters = self.parser.get_chapter_list(manga, page);
+        Ok(chapters)
     }
 }

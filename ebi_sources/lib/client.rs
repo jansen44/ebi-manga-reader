@@ -2,6 +2,8 @@ use reqwest::header;
 use std::error;
 use std::fmt::Display;
 
+pub type ClientResult<T> = Result<T, ClientErrors>;
+
 #[derive(Debug)]
 pub enum ClientErrors {
     InvalidHeaderValue(header::InvalidHeaderValue),
