@@ -38,7 +38,7 @@ impl OpexClient {
         Ok(body)
     }
 
-    pub async fn _get_chapter_web_page(&self, chapter: &Chapter) -> Result<String, ClientErrors> {
+    pub async fn get_chapter_web_page(&self, chapter: &Chapter) -> Result<String, ClientErrors> {
         let url = format!("{}{}", self.base_url, chapter.url);
         let body = self.client.get(url).send().await?.text().await?;
         Ok(body)

@@ -83,4 +83,10 @@ impl Opex {
         let chapter = chapter.unwrap();
         Ok(Some(chapter.to_owned()))
     }
+
+    pub async fn pages(&self, chapter: &Chapter) -> ClientResult<Vec<String>> {
+        let page = self.client.get_chapter_web_page(chapter).await?;
+        let pages = self.parser.get_page_list(page);
+        Ok(pages)
+    }
 }

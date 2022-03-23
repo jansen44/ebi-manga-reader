@@ -8,6 +8,7 @@ async fn main() -> Result<(), SourceErrors> {
     let manga = opex.manga(3).await?.unwrap();
     let chapters = opex.chapters(&manga).await?;
     let chapter = opex.chapter(&manga, 7).await?.unwrap();
+    let pages = opex.pages(&chapter).await?;
 
     println!("Source: {:?}", Opex::source());
 
@@ -21,6 +22,10 @@ async fn main() -> Result<(), SourceErrors> {
     }
 
     println!("Chapter 7: {:?}", chapter);
+
+    for page in pages {
+        println!("{:?}", page);
+    }
 
     Ok(())
 }

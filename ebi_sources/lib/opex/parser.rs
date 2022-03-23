@@ -23,6 +23,58 @@ impl Parser {
         }
     }
 
+    pub fn get_chapter_list(&self, manga: &Manga, manga_page_body: String) -> Vec<Chapter> {
+        let page = Html::parse_document(manga_page_body.as_str());
+
+        let selector = self.chapter_list_selectors.get(&manga.name);
+        if selector.is_none() {
+            return vec![];
+        }
+
+        let mut chapters = vec![];
+        let mut current_id = 1;
+        for element in page.select(selector.unwrap()) {
+            let chapter = Self::chapter_from_element(manga, element);
+            if let Some(chapter) = chapter {
+                let mut chapter = chapter;
+                if chapter.id == 0 {
+                    chapter.id = current_id;
+                    current_id += 1;
+                }
+                chapters.push(chapter);
+            }
+        }
+        chapters
+    }
+
+    pub fn get_page_list(&self, chapter_page_body: String) -> Vec<String> {
+        let page = Html::parse_document(chapter_page_body.as_str());
+        let script_selector = Selector::parse("#leitor-opex > strong > script").unwrap();
+
+        let script_elem = page.select(&script_selector).next().unwrap().inner_html();
+        let script_elem = script_elem.split("paginasLista = ").nth(1).unwrap();
+        let script_elem = script_elem.split(";").next().unwrap();
+
+        let raw_json_object: serde_json::Value = serde_json::from_str(script_elem).unwrap();
+        let str_raw_json_object = raw_json_object.as_str().unwrap();
+        let raw_json_object: serde_json::Value = serde_json::from_str(str_raw_json_object).unwrap();
+        let raw_json_object = raw_json_object.as_object().unwrap();
+
+        let page_list: Vec<(&String, &serde_json::Value)> = raw_json_object.iter().collect();
+        let mut page_list = page_list
+            .iter()
+            .map(|(key, value)| {
+                (
+                    key.parse::<usize>().unwrap(),
+                    value.as_str().unwrap().to_owned(),
+                )
+            })
+            .collect::<Vec<(usize, String)>>();
+        page_list.sort_by(|a, b| a.0.cmp(&b.0));
+
+        page_list.iter().map(|(_, value)| value.clone()).collect()
+    }
+
     fn get_child_span_value(element: ElementRef) -> String {
         let selector = Selector::parse("span").unwrap();
         element.select(&selector).next().unwrap().inner_html()
@@ -115,29 +167,5 @@ impl Parser {
             }),
             None => None,
         }
-    }
-
-    pub fn get_chapter_list(&self, manga: &Manga, manga_page_body: String) -> Vec<Chapter> {
-        let page = Html::parse_document(manga_page_body.as_str());
-
-        let selector = self.chapter_list_selectors.get(&manga.name);
-        if selector.is_none() {
-            return vec![];
-        }
-
-        let mut chapters = vec![];
-        let mut current_id = 1;
-        for element in page.select(selector.unwrap()) {
-            let chapter = Self::chapter_from_element(manga, element);
-            if let Some(chapter) = chapter {
-                let mut chapter = chapter;
-                if chapter.id == 0 {
-                    chapter.id = current_id;
-                    current_id += 1;
-                }
-                chapters.push(chapter);
-            }
-        }
-        chapters
     }
 }
