@@ -1,13 +1,15 @@
 use std::collections::HashMap;
 
 use crate::{Chapter, Manga};
-use scraper::{element_ref::Select, ElementRef, Html, Selector};
+use scraper::{ElementRef, Html, Selector};
 
 const MAIN_CHAPTER_LIST_SELECTOR: &str = "#volumes div.capitulos li.volume-capitulo";
 const SBS_CHAPTER_LIST_SELECTOR: &str =
     "#conteudo #post > a.text-uppercase.sombra-clara.bnt-lista-horizontal";
 const COVERS_CHAPTER_LIST_SELECTOR: &str =
     "#post div.volume.text-uppercase div.capitulos li.volume-capitulo";
+
+type ChapterInfo = (usize, String, String);
 
 pub struct Parser {
     chapter_list_selectors: HashMap<String, Selector>,
@@ -26,7 +28,7 @@ impl Parser {
         element.select(&selector).next().unwrap().inner_html()
     }
 
-    fn href_from_child_anchor(element: ElementRef) -> String {
+    fn href_from_anchor(element: ElementRef) -> String {
         element.value().attr("href").unwrap().to_owned()
     }
 
@@ -64,41 +66,55 @@ impl Parser {
         (id, title)
     }
 
-    fn main_chapter_from_element(manga: &Manga, element: ElementRef) -> Chapter {
+    fn main_chapter_info_from_element(element: ElementRef) -> ChapterInfo {
         let base_title = Self::get_child_span_value(element);
-        let url = Self::href_from_child_anchor(
+        let url = Self::href_from_anchor(
             element
                 .select(&Selector::parse("a.online").unwrap())
                 .next()
                 .unwrap(),
         );
         let (id, title) = Self::get_id_from_title(base_title);
+        (id, title, url)
+    }
 
-        Chapter {
-            id,
-            mangaId: manga.id,
-            title,
-            url,
-            source_name: manga.source_name.clone(),
-        }
+    fn sbs_chapter_info_from_element(element: ElementRef) -> ChapterInfo {
+        let title = Self::get_child_span_value(element);
+        let url = Self::href_from_anchor(element);
+        (0, title, url)
+    }
+
+    fn covers_chapter_info_from_element(element: ElementRef) -> ChapterInfo {
+        let title = element.text().next().unwrap();
+        let title = &title[..title.len() - 1];
+        let title = title.to_owned();
+        let url = Self::href_from_anchor(
+            element
+                .select(&Selector::parse("a.online").unwrap())
+                .next()
+                .unwrap(),
+        );
+        (0, title, url)
     }
 
     fn chapter_from_element(manga: &Manga, element: ElementRef) -> Option<Chapter> {
-        //    match manga.name.as_str() {
-        //        "main" => Some(Chapter{
-        //            id: 0,
-        //            mangaId: manga.id,
-        //            source_name: manga.source_name.clone(),
-        //            title: String::from(element.select(&Selector::parse("span").unwrap()).next().),
-        //            url: String::new(),
-        //        }),
-        //        _ => None,
-        //    }
+        let info = match manga.name.as_str() {
+            "main" => Some(Self::main_chapter_info_from_element(element)),
+            "sbs" => Some(Self::sbs_chapter_info_from_element(element)),
+            "covers" => Some(Self::covers_chapter_info_from_element(element)),
+            _ => None,
+        };
 
-        let chapter = Self::main_chapter_from_element(manga, element);
-        // println!("{:?}", chapter);
-
-        Some(chapter)
+        match info {
+            Some((id, title, url)) => Some(Chapter {
+                id,
+                manga_id: manga.id,
+                title,
+                url,
+                source_name: manga.source_name.clone(),
+            }),
+            None => None,
+        }
     }
 
     pub fn get_chapter_list(&self, manga: &Manga, manga_page_body: String) -> Vec<Chapter> {
@@ -110,9 +126,15 @@ impl Parser {
         }
 
         let mut chapters = vec![];
+        let mut current_id = 1;
         for element in page.select(selector.unwrap()) {
             let chapter = Self::chapter_from_element(manga, element);
             if let Some(chapter) = chapter {
+                let mut chapter = chapter;
+                if chapter.id == 0 {
+                    chapter.id = current_id;
+                    current_id += 1;
+                }
                 chapters.push(chapter);
             }
         }

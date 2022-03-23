@@ -27,7 +27,7 @@ impl Opex {
     pub async fn mangas(&self) -> ClientResult<Vec<Manga>> {
         Ok(vec![
             Manga {
-                id: 0,
+                id: 1,
                 title: String::from("One Piece"),
                 name: String::from("main"),
                 thumbnail: String::from(
@@ -37,7 +37,7 @@ impl Opex {
                 source_name: Opex::source().name,
             },
             Manga {
-                id: 1,
+                id: 2,
                 title: String::from("SBS"),
                 name: String::from("sbs"),
                 thumbnail: String::from(
@@ -47,7 +47,7 @@ impl Opex {
                 source_name: Opex::source().name,
             },
             Manga {
-                id: 2,
+                id: 3,
                 title: String::from("Histórias de Capa"),
                 name: String::from("covers"),
                 thumbnail: String::from("https://onepieceex.net/mangareader/mangas/428/00_c.jpg"),
@@ -59,10 +59,10 @@ impl Opex {
 
     pub async fn manga(&self, id: usize) -> ClientResult<Option<Manga>> {
         let mangas = self.mangas().await?;
-        if id >= mangas.len() {
+        if id > mangas.len() || id == 0 {
             return Ok(None);
         }
-        Ok(Some(mangas[id].clone()))
+        Ok(Some(mangas[id - 1].clone()))
     }
 
     pub async fn chapters(&self, manga: &Manga) -> ClientResult<Vec<Chapter>> {

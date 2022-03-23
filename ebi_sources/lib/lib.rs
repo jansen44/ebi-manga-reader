@@ -6,29 +6,29 @@ pub mod opex;
 
 #[derive(Clone, Debug)]
 pub struct Source {
-    name: String,
-    title: String,
-    description: String,
-    base_url: String,
+    pub name: String,
+    pub title: String,
+    pub description: String,
+    pub base_url: String,
 }
 
 #[derive(Clone, Debug)]
 pub struct Manga {
-    id: usize,
-    name: String,
-    title: String,
-    thumbnail: String,
-    url: String,
-    source_name: String,
+    pub id: usize,
+    pub name: String,
+    pub title: String,
+    pub thumbnail: String,
+    pub url: String,
+    pub source_name: String,
 }
 
 #[derive(Clone, Debug)]
 pub struct Chapter {
-    id: usize,
-    mangaId: usize,
-    title: String,
-    url: String,
-    source_name: String,
+    pub id: usize,
+    pub manga_id: usize,
+    pub title: String,
+    pub url: String,
+    pub source_name: String,
 }
 
 #[derive(Debug)]
