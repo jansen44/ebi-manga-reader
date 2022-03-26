@@ -23,8 +23,8 @@ impl Parser {
         }
     }
 
-    pub fn get_chapter_list(&self, manga: &Manga, manga_page_body: String) -> Vec<Chapter> {
-        let page = Html::parse_document(manga_page_body.as_str());
+    pub fn get_chapter_list(&self, manga: &Manga, manga_page_body: &str) -> Vec<Chapter> {
+        let page = Html::parse_document(manga_page_body);
 
         let selector = self.chapter_list_selectors.get(&manga.name);
         if selector.is_none() {
@@ -47,17 +47,21 @@ impl Parser {
         chapters
     }
 
-    pub fn get_page_list(&self, chapter_page_body: String) -> Vec<String> {
-        let page = Html::parse_document(chapter_page_body.as_str());
+    pub fn get_page_list(&self, chapter_page_body: &str) -> Vec<String> {
+        let page = Html::parse_document(chapter_page_body);
         let script_selector = Selector::parse("#leitor-opex > strong > script").unwrap();
 
         let script_elem = page.select(&script_selector).next().unwrap().inner_html();
-        let script_elem = script_elem.split("paginasLista = ").nth(1).unwrap();
-        let script_elem = script_elem.split(";").next().unwrap();
+        let script_elem = script_elem
+            .split("paginasLista = ")
+            .nth(1)
+            .unwrap()
+            .split(";")
+            .next()
+            .unwrap();
 
-        let raw_json_object: serde_json::Value = serde_json::from_str(script_elem).unwrap();
-        let str_raw_json_object = raw_json_object.as_str().unwrap();
-        let raw_json_object: serde_json::Value = serde_json::from_str(str_raw_json_object).unwrap();
+        let raw_json_object = serde_json::from_str::<&str>(script_elem).unwrap();
+        let raw_json_object: serde_json::Value = serde_json::from_str(raw_json_object).unwrap();
         let raw_json_object = raw_json_object.as_object().unwrap();
 
         let page_list: Vec<(&String, &serde_json::Value)> = raw_json_object.iter().collect();
@@ -101,7 +105,7 @@ impl Parser {
         chapter_list_selectors
     }
 
-    fn get_id_from_title(base_title: String) -> (usize, String) {
+    fn get_id_from_title(base_title: &str) -> (usize, String) {
         let mut id = "";
         let mut title = String::new();
 
@@ -126,7 +130,7 @@ impl Parser {
                 .next()
                 .unwrap(),
         );
-        let (id, title) = Self::get_id_from_title(base_title);
+        let (id, title) = Self::get_id_from_title(base_title.as_str());
         (id, title, url)
     }
 

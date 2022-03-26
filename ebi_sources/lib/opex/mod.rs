@@ -67,7 +67,7 @@ impl Opex {
 
     pub async fn chapters(&self, manga: &Manga) -> ClientResult<Vec<Chapter>> {
         let page = self.client.get_manga_web_page(manga).await?;
-        let chapters = self.parser.get_chapter_list(manga, page);
+        let chapters = self.parser.get_chapter_list(manga, page.as_str());
         Ok(chapters)
     }
 
@@ -86,7 +86,7 @@ impl Opex {
 
     pub async fn pages(&self, chapter: &Chapter) -> ClientResult<Vec<String>> {
         let page = self.client.get_chapter_web_page(chapter).await?;
-        let pages = self.parser.get_page_list(page);
+        let pages = self.parser.get_page_list(page.as_str());
         Ok(pages)
     }
 }
