@@ -1,7 +1,8 @@
 use std::collections::HashMap;
 
-use crate::{Chapter, Manga};
 use scraper::{ElementRef, Html, Selector};
+
+use crate::{Chapter, Manga};
 
 const MAIN_CHAPTER_LIST_SELECTOR: &str = "#volumes div.capitulos li.volume-capitulo";
 const SBS_CHAPTER_LIST_SELECTOR: &str =

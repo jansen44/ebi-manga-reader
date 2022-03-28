@@ -1,6 +1,7 @@
-use reqwest::header;
 use std::error;
 use std::fmt::Display;
+
+use reqwest::header;
 
 pub type ClientResult<T> = Result<T, ClientErrors>;
 

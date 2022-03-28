@@ -1,9 +1,9 @@
-use crate::client::ClientErrors;
-use crate::{Chapter, Manga, Source};
-
 use reqwest::header;
 use reqwest::header::HeaderMap;
 use reqwest::Client;
+
+use crate::client::ClientErrors;
+use crate::{Chapter, Manga, Source};
 
 const ACCEPT_HEADER: &str = "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9";
 const REFERER_HEADER: &str = "https://onepieceex.net/";
