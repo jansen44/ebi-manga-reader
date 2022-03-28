@@ -1,4 +1,8 @@
-use crate::{client::ClientResult, Chapter, Manga, Source, SourceErrors};
+use crate::client::ClientResult;
+use crate::Chapter;
+use crate::Manga;
+use crate::Source;
+use crate::SourceErrors;
 
 mod client;
 mod parser;
