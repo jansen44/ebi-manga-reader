@@ -11,7 +11,7 @@ pub struct Yabu {
 
 impl Yabu {
     pub fn new() -> Result<Self, SourceErrors> {
-        let client = client::YabuClient {};
+        let client = client::YabuClient::new(Self::source())?;
         let parser = parser::Parser {};
         Ok(Self { client, parser })
     }
