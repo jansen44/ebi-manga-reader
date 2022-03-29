@@ -27,7 +27,7 @@ impl Parser {
     pub fn get_chapter_list(&self, manga: &Manga, manga_page_body: &str) -> Vec<Chapter> {
         let page = Html::parse_document(manga_page_body);
 
-        let selector = self.chapter_list_selectors.get(&manga.name);
+        let selector = self.chapter_list_selectors.get(&manga.identifier);
         if selector.is_none() {
             return vec![];
         }
@@ -61,8 +61,8 @@ impl Parser {
             .next()
             .unwrap();
 
-        let raw_json_object = serde_json::from_str::<&str>(script_elem).unwrap();
-        let raw_json_object: serde_json::Value = serde_json::from_str(raw_json_object).unwrap();
+        let raw_json_object = serde_json::from_str::<String>(script_elem).unwrap();
+        let raw_json_object: serde_json::Value = serde_json::from_str(raw_json_object.as_str()).unwrap();
         let raw_json_object = raw_json_object.as_object().unwrap();
 
         let page_list: Vec<(&String, &serde_json::Value)> = raw_json_object.iter().collect();
@@ -155,7 +155,7 @@ impl Parser {
     }
 
     fn chapter_from_element(manga: &Manga, element: ElementRef) -> Option<Chapter> {
-        let info = match manga.name.as_str() {
+        let info = match manga.identifier.as_str() {
             "main" => Some(Self::main_chapter_info_from_element(element)),
             "sbs" => Some(Self::sbs_chapter_info_from_element(element)),
             "covers" => Some(Self::covers_chapter_info_from_element(element)),
@@ -165,7 +165,7 @@ impl Parser {
         match info {
             Some((id, title, url)) => Some(Chapter {
                 id,
-                manga_id: manga.id,
+                manga_identifier: manga.identifier.clone(),
                 title,
                 url,
                 source_name: manga.source_name.clone(),

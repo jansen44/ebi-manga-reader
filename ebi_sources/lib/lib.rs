@@ -16,8 +16,7 @@ pub struct Source {
 
 #[derive(Clone, Debug)]
 pub struct Manga {
-    pub id: usize,
-    pub name: String,
+    pub identifier: String,
     pub title: String,
     pub thumbnail: String,
     pub url: String,
@@ -27,7 +26,7 @@ pub struct Manga {
 #[derive(Clone, Debug)]
 pub struct Chapter {
     pub id: usize,
-    pub manga_id: usize,
+    pub manga_identifier: String,
     pub title: String,
     pub url: String,
     pub source_name: String,

@@ -5,7 +5,7 @@ use ebi_sources::SourceErrors;
 async fn main() -> Result<(), SourceErrors> {
     let opex = Opex::new()?;
     let mangas = opex.mangas().await?;
-    let manga = opex.manga(3).await?.unwrap();
+    let manga = opex.manga("main").await?.unwrap();
     let chapters = opex.chapters(&manga).await?;
     let chapter = opex.chapter(&manga, 7).await?.unwrap();
     let pages = opex.pages(&chapter).await?;

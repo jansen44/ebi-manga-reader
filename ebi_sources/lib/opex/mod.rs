@@ -31,9 +31,8 @@ impl Opex {
     pub async fn mangas(&self) -> ClientResult<Vec<Manga>> {
         Ok(vec![
             Manga {
-                id: 1,
+                identifier: String::from("main"),
                 title: String::from("One Piece"),
-                name: String::from("main"),
                 thumbnail: String::from(
                     "https://onepieceex.net/mangareader/sbs/capa/preview/Volume_1.jpg",
                 ),
@@ -41,9 +40,8 @@ impl Opex {
                 source_name: Opex::source().name,
             },
             Manga {
-                id: 2,
+                identifier: String::from("sbs"),
                 title: String::from("SBS"),
-                name: String::from("sbs"),
                 thumbnail: String::from(
                     "https://onepieceex.net/mangareader/sbs/capa/preview/nao.jpg",
                 ),
@@ -51,9 +49,8 @@ impl Opex {
                 source_name: Opex::source().name,
             },
             Manga {
-                id: 3,
+                identifier: String::from("covers"),
                 title: String::from("Histórias de Capa"),
-                name: String::from("covers"),
                 thumbnail: String::from("https://onepieceex.net/mangareader/mangas/428/00_c.jpg"),
                 url: String::from("//historias-de-capa"),
                 source_name: Opex::source().name,
@@ -61,12 +58,13 @@ impl Opex {
         ])
     }
 
-    pub async fn manga(&self, id: usize) -> ClientResult<Option<Manga>> {
+    pub async fn manga(&self, identifier: &str) -> ClientResult<Option<Manga>> {
         let mangas = self.mangas().await?;
-        if id > mangas.len() || id == 0 {
-            return Ok(None);
+        let manga = mangas.iter().find(|el| el.identifier == identifier);
+        match manga {
+            Some(manga) => Ok(Some(manga.to_owned())),
+            None => Ok(None),
         }
-        Ok(Some(mangas[id - 1].clone()))
     }
 
     pub async fn chapters(&self, manga: &Manga) -> ClientResult<Vec<Chapter>> {
