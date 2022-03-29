@@ -16,4 +16,10 @@ impl YabuClient {
             base_url: source.base_url.clone(),
         })
     }
+
+    pub async fn get_manga_list(&self) -> Result<String, ClientErrors> {
+        let url = self.base_url.clone();
+        let body = self.client.get(url).send().await?.text().await?;
+        Ok(body)
+    }
 }
