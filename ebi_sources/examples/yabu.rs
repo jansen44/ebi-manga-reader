@@ -1,4 +1,4 @@
-use ebi_sources::{SourceErrors, yabu::Yabu};
+use ebi_sources::{errors::SourceErrors, yabu::Yabu};
 
 #[tokio::main]
 async fn main() -> Result<(), SourceErrors> {

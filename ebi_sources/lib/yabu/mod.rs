@@ -1,7 +1,7 @@
-use crate::client::ClientResult;
+use crate::errors::SourceResult;
 use crate::Manga;
 use crate::Source;
-use crate::SourceErrors;
+use crate::errors::SourceErrors;
 
 mod client;
 mod parser;
@@ -27,7 +27,7 @@ impl Yabu {
         }
     }
 
-    pub async fn mangas(&self) -> ClientResult<Vec<Manga>> {
+    pub async fn mangas(&self) -> SourceResult<Vec<Manga>> {
         let body = self.client.get_manga_list().await?;
         let manga_list = self.parser.popular_manga_from_page(body.as_str());
         Ok(manga_list)

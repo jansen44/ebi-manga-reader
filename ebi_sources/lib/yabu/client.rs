@@ -1,6 +1,6 @@
 use reqwest::Client;
 
-use crate::client::ClientErrors;
+use crate::errors::ClientErrors;
 use crate::Source;
 
 pub struct YabuClient {

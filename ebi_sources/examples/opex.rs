@@ -1,5 +1,5 @@
 use ebi_sources::opex::Opex;
-use ebi_sources::SourceErrors;
+use ebi_sources::errors::SourceErrors;
 
 #[tokio::main]
 async fn main() -> Result<(), SourceErrors> {

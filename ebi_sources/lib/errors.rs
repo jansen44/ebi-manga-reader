@@ -3,7 +3,7 @@ use std::fmt::Display;
 
 use reqwest::header;
 
-pub type ClientResult<T> = Result<T, ClientErrors>;
+pub type SourceResult<T> = Result<T, ClientErrors>;
 
 #[derive(Debug)]
 pub enum ClientErrors {
@@ -38,5 +38,33 @@ impl From<header::InvalidHeaderValue> for ClientErrors {
 impl From<reqwest::Error> for ClientErrors {
     fn from(err: reqwest::Error) -> Self {
         ClientErrors::ReqwestError(err)
+    }
+}
+
+
+#[derive(Debug)]
+pub enum SourceErrors {
+    ClientErrors(ClientErrors),
+}
+
+impl Display for SourceErrors {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        match *self {
+            SourceErrors::ClientErrors(ref e) => write!(f, "{e}"),
+        }
+    }
+}
+
+impl error::Error for SourceErrors {
+    fn source(&self) -> Option<&(dyn error::Error + 'static)> {
+        match *self {
+            SourceErrors::ClientErrors(ref e) => Some(e),
+        }
+    }
+}
+
+impl From<ClientErrors> for SourceErrors {
+    fn from(err: ClientErrors) -> Self {
+        SourceErrors::ClientErrors(err)
     }
 }
