@@ -1,6 +1,6 @@
 use reqwest::Client;
 
-use crate::errors::ClientErrors;
+use crate::errors::client::ClientResult;
 use crate::Source;
 
 pub struct YabuClient {
@@ -9,15 +9,16 @@ pub struct YabuClient {
 }
 
 impl YabuClient {
-    pub fn new(source: Source) -> Result<Self, ClientErrors> {
-        let client = Client::builder().build()?;
+    pub fn new(source: Source) -> ClientResult<Self> {
+        let client = Client::builder().build().unwrap();
+
         Ok(Self {
             client,
             base_url: source.base_url.clone(),
         })
     }
 
-    pub async fn get_manga_list(&self) -> Result<String, ClientErrors> {
+    pub async fn get_manga_list(&self) -> ClientResult<String> {
         let url = self.base_url.clone();
         let body = self.client.get(url).send().await?.text().await?;
         Ok(body)

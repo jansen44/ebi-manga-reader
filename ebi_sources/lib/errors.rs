@@ -1,70 +1,73 @@
 use std::error;
 use std::fmt::Display;
 
-use reqwest::header;
-
-pub type SourceResult<T> = Result<T, ClientErrors>;
+pub type Result<T> = std::result::Result<T, SourceError>;
 
 #[derive(Debug)]
-pub enum ClientErrors {
-    InvalidHeaderValue(header::InvalidHeaderValue),
-    ReqwestError(reqwest::Error),
+pub enum SourceError {
+    ClientError(client::ClientError),
 }
 
-impl Display for ClientErrors {
+impl Display for SourceError {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match *self {
-            ClientErrors::InvalidHeaderValue(ref e) => write!(f, "error: {e}"),
-            ClientErrors::ReqwestError(ref e) => write!(f, "error: {e}"),
+            SourceError::ClientError(ref e) => write!(f, "client_error: {e}"),
         }
     }
 }
 
-impl error::Error for ClientErrors {
+impl error::Error for SourceError {
     fn source(&self) -> Option<&(dyn error::Error + 'static)> {
         match *self {
-            ClientErrors::InvalidHeaderValue(ref e) => Some(e),
-            ClientErrors::ReqwestError(ref e) => Some(e),
+            SourceError::ClientError(ref e) => e.source(),
         }
     }
 }
 
-impl From<header::InvalidHeaderValue> for ClientErrors {
-    fn from(err: header::InvalidHeaderValue) -> Self {
-        ClientErrors::InvalidHeaderValue(err)
+impl From<client::ClientError> for SourceError {
+    fn from(err: client::ClientError) -> Self {
+        SourceError::ClientError(err)
     }
 }
 
-impl From<reqwest::Error> for ClientErrors {
-    fn from(err: reqwest::Error) -> Self {
-        ClientErrors::ReqwestError(err)
+pub mod client {
+    use std::error;
+    use std::fmt::Display;
+
+    pub type ClientResult<T> = std::result::Result<T, ClientError>;
+
+    #[derive(Debug)]
+    pub enum ClientError {
+        RequestError(reqwest::Error),
+        RequestBodyError(reqwest::Error),
     }
-}
 
-
-#[derive(Debug)]
-pub enum SourceErrors {
-    ClientErrors(ClientErrors),
-}
-
-impl Display for SourceErrors {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        match *self {
-            SourceErrors::ClientErrors(ref e) => write!(f, "{e}"),
+    impl Display for ClientError {
+        fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+            match *self {
+                ClientError::RequestError(ref e) | ClientError::RequestBodyError(ref e) => {
+                    write!(f, "{e}")
+                }
+            }
         }
     }
-}
 
-impl error::Error for SourceErrors {
-    fn source(&self) -> Option<&(dyn error::Error + 'static)> {
-        match *self {
-            SourceErrors::ClientErrors(ref e) => Some(e),
+    impl error::Error for ClientError {
+        fn source(&self) -> Option<&(dyn error::Error + 'static)> {
+            match *self {
+                ClientError::RequestError(ref e) | ClientError::RequestBodyError(ref e) => {
+                    e.source()
+                }
+            }
         }
     }
-}
 
-impl From<ClientErrors> for SourceErrors {
-    fn from(err: ClientErrors) -> Self {
-        SourceErrors::ClientErrors(err)
+    impl From<reqwest::Error> for ClientError {
+        fn from(err: reqwest::Error) -> Self {
+            if err.is_body() {
+                return ClientError::RequestBodyError(err);
+            }
+            ClientError::RequestError(err)
+        }
     }
 }

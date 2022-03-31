@@ -1,7 +1,8 @@
-use ebi_sources::{errors::SourceErrors, yabu::Yabu};
+use ebi_sources::errors::Result;
+use ebi_sources::yabu::Yabu;
 
 #[tokio::main]
-async fn main() -> Result<(), SourceErrors> {
+async fn main() -> Result<()> {
     let yabu = Yabu::new()?;
     let manga_list = yabu.mangas().await?;
 

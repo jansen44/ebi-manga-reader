@@ -2,7 +2,7 @@ use reqwest::header;
 use reqwest::header::HeaderMap;
 use reqwest::Client;
 
-use crate::errors::ClientErrors;
+use crate::errors::client::ClientResult;
 use crate::{Chapter, Manga, Source};
 
 const ACCEPT_HEADER: &str = "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9";
@@ -15,30 +15,32 @@ pub struct OpexClient {
 }
 
 impl OpexClient {
-    pub fn new(source: Source) -> Result<Self, ClientErrors> {
-        let headers = Self::build_default_headers()?;
-        let client = Client::builder().default_headers(headers).build()?;
-        Ok(Self {
-            client,
-            base_url: source.base_url.clone(),
-        })
+    pub fn new(source: Source) -> Self {
+        let headers = Self::build_default_headers();
+        let client = Client::builder().default_headers(headers).build().unwrap();
+        let base_url = source.base_url;
+
+        Self { client, base_url }
     }
 
-    fn build_default_headers() -> Result<HeaderMap, ClientErrors> {
+    fn build_default_headers() -> HeaderMap {
         let mut headers = HeaderMap::new();
-        headers.insert(header::ACCEPT, ACCEPT_HEADER.parse()?);
-        headers.insert(header::REFERER, REFERER_HEADER.parse()?);
-        headers.insert(header::ACCEPT_LANGUAGE, ACCEPT_LANGUAGE_HEADER.parse()?);
-        Ok(headers)
+        headers.insert(header::ACCEPT, ACCEPT_HEADER.parse().unwrap());
+        headers.insert(header::REFERER, REFERER_HEADER.parse().unwrap());
+        headers.insert(
+            header::ACCEPT_LANGUAGE,
+            ACCEPT_LANGUAGE_HEADER.parse().unwrap(),
+        );
+        headers
     }
 
-    pub async fn get_manga_web_page(&self, manga: &Manga) -> Result<String, ClientErrors> {
+    pub async fn get_manga_web_page(&self, manga: &Manga) -> ClientResult<String> {
         let url = format!("{}{}", self.base_url, manga.url);
         let body = self.client.get(url).send().await?.text().await?;
         Ok(body)
     }
 
-    pub async fn get_chapter_web_page(&self, chapter: &Chapter) -> Result<String, ClientErrors> {
+    pub async fn get_chapter_web_page(&self, chapter: &Chapter) -> ClientResult<String> {
         let url = format!("{}{}", self.base_url, chapter.url);
         let body = self.client.get(url).send().await?.text().await?;
         Ok(body)

@@ -1,8 +1,8 @@
+use ebi_sources::errors::Result;
 use ebi_sources::opex::Opex;
-use ebi_sources::errors::SourceErrors;
 
 #[tokio::main]
-async fn main() -> Result<(), SourceErrors> {
+async fn main() -> Result<()> {
     let opex = Opex::new()?;
     let mangas = opex.mangas().await?;
     let manga = opex.manga("main").await?.unwrap();
