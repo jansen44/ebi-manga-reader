@@ -138,8 +138,10 @@ dependencies = [
 name = "ebi_sources"
 version = "0.1.0"
 dependencies = [
+ "cssparser",
  "reqwest",
  "scraper",
+ "selectors",
  "serde_json",
  "tokio",
 ]

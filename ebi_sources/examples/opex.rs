@@ -2,12 +2,15 @@ use ebi_sources::errors::Result;
 use ebi_sources::opex::Opex;
 
 #[tokio::main]
-async fn main() -> Result<()> {
+async fn main() -> Result<'static, ()> {
     let opex = Opex::new()?;
+
     let mangas = opex.mangas().await?;
     let manga = opex.manga("main").await?.unwrap();
+
     let chapters = opex.chapters(&manga).await?;
     let chapter = opex.chapter(&manga, 7).await?.unwrap();
+
     let pages = opex.pages(&chapter).await?;
 
     println!("Source: {:?}", Opex::source());

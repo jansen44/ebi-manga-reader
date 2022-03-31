@@ -10,8 +10,8 @@ pub struct Yabu {
     parser: parser::Parser,
 }
 
-impl Yabu {
-    pub fn new() -> Result<Self> {
+impl<'i> Yabu {
+    pub fn new() -> Result<'i, Self> {
         let client = client::YabuClient::new(Self::source())?;
         let parser = parser::Parser::new();
         Ok(Self { client, parser })
@@ -26,7 +26,7 @@ impl Yabu {
         }
     }
 
-    pub async fn mangas(&self) -> Result<Vec<Manga>> {
+    pub async fn mangas(&self) -> Result<'i, Vec<Manga>> {
         let body = self.client.get_manga_list().await?;
         let manga_list = self.parser.popular_manga_from_page(body.as_str());
         Ok(manga_list)

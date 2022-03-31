@@ -19,9 +19,7 @@ pub struct Parser {
 impl Parser {
     pub fn new() -> Self {
         let chapter_list_selectors = Self::chapter_list_selectors();
-        Self {
-            chapter_list_selectors,
-        }
+        Self { chapter_list_selectors }
     }
 
     pub fn get_chapter_list(&self, manga: &Manga, manga_page_body: &str) -> Vec<Chapter> {

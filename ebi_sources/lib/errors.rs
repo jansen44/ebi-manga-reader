@@ -1,32 +1,46 @@
 use std::error;
 use std::fmt::Display;
 
-pub type Result<T> = std::result::Result<T, SourceError>;
+use selectors::parser::SelectorParseErrorKind;
+
+pub type ParseError<'a> = cssparser::ParseError<'a, SelectorParseErrorKind<'a>>;
+pub type ParseResult<'a, T> = std::result::Result<T, ParseError<'a>>;
+
+pub type Result<'a, T> = std::result::Result<T, SourceError<'a>>;
 
 #[derive(Debug)]
-pub enum SourceError {
+pub enum SourceError<'a> {
     ClientError(client::ClientError),
+    ParseError(ParseError<'a>),
 }
 
-impl Display for SourceError {
+impl<'a> Display for SourceError<'a> {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match *self {
             SourceError::ClientError(ref e) => write!(f, "client_error: {e}"),
+            SourceError::ParseError(ref e) => write!(f, "parsing_error: {:?}", e),
         }
     }
 }
 
-impl error::Error for SourceError {
+impl<'a> error::Error for SourceError<'a> {
     fn source(&self) -> Option<&(dyn error::Error + 'static)> {
         match *self {
             SourceError::ClientError(ref e) => e.source(),
+            SourceError::ParseError(_) => None, // ToDo: Fix this later
         }
     }
 }
 
-impl From<client::ClientError> for SourceError {
+impl<'a> From<client::ClientError> for SourceError<'a> {
     fn from(err: client::ClientError) -> Self {
         SourceError::ClientError(err)
+    }
+}
+
+impl<'a> From<ParseError<'a>> for SourceError<'a> {
+    fn from(err: ParseError<'a>) -> Self {
+        SourceError::ParseError(err)
     }
 }
 
