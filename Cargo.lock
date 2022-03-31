@@ -146,6 +146,14 @@ dependencies = [
 ]
 
 [[package]]
+name = "ebi_archive"
+version = "0.1.0"
+dependencies = [
+ "ebi_sources",
+ "tokio",
+]
+
+[[package]]
 name = "ebi_sources"
 version = "0.1.0"
 dependencies = [
