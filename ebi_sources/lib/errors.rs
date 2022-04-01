@@ -1,24 +1,19 @@
 use std::error;
 use std::fmt::Display;
 
-use selectors::parser::SelectorParseErrorKind;
-
-pub type ParseError<'a> = cssparser::ParseError<'a, SelectorParseErrorKind<'a>>;
-pub type ParseResult<'a, T> = std::result::Result<T, ParseError<'a>>;
-
 pub type Result<'a, T> = std::result::Result<T, SourceError<'a>>;
 
 #[derive(Debug)]
 pub enum SourceError<'a> {
     ClientError(client::ClientError),
-    ParseError(ParseError<'a>),
+    ParserError(parser::ParserError<'a>),
 }
 
 impl<'a> Display for SourceError<'a> {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match *self {
             SourceError::ClientError(ref e) => write!(f, "client_error: {e}"),
-            SourceError::ParseError(ref e) => write!(f, "parsing_error: {:?}", e),
+            SourceError::ParserError(ref e) => write!(f, "parsing_error: {:?}", e),
         }
     }
 }
@@ -27,7 +22,7 @@ impl<'a> error::Error for SourceError<'a> {
     fn source(&self) -> Option<&(dyn error::Error + 'static)> {
         match *self {
             SourceError::ClientError(ref e) => e.source(),
-            SourceError::ParseError(_) => None, // ToDo: Fix this later
+            SourceError::ParserError(_) => None,
         }
     }
 }
@@ -38,9 +33,9 @@ impl<'a> From<client::ClientError> for SourceError<'a> {
     }
 }
 
-impl<'a> From<ParseError<'a>> for SourceError<'a> {
-    fn from(err: ParseError<'a>) -> Self {
-        SourceError::ParseError(err)
+impl<'a> From<parser::ParserError<'a>> for SourceError<'a> {
+    fn from(err: parser::ParserError<'a>) -> Self {
+        SourceError::ParserError(err)
     }
 }
 
@@ -82,6 +77,46 @@ pub mod client {
                 return ClientError::RequestBodyError(err);
             }
             ClientError::RequestError(err)
+        }
+    }
+}
+
+pub mod parser {
+    use std::num::ParseIntError;
+
+    use selectors::parser::SelectorParseErrorKind;
+
+    pub type ParserResult<'a, T> = std::result::Result<T, ParserError<'a>>;
+
+    #[derive(Debug)]
+    pub enum ParserError<'a> {
+        Other(&'a str),
+        ParsingError(cssparser::ParseError<'a, SelectorParseErrorKind<'a>>),
+        MissingElement(&'a str),
+        FailedTypeConversion(String),
+    }
+
+    impl<'a> From<cssparser::ParseError<'a, SelectorParseErrorKind<'a>>> for ParserError<'a> {
+        fn from(err: cssparser::ParseError<'a, SelectorParseErrorKind<'a>>) -> Self {
+            ParserError::ParsingError(err)
+        }
+    }
+
+    impl<'a> From<ParseIntError> for ParserError<'a> {
+        fn from(err: ParseIntError) -> Self {
+            ParserError::FailedTypeConversion(format!("{:?}", err.kind()))
+        }
+    }
+
+    impl<'a> From<serde_json::error::Error> for ParserError<'a> {
+        fn from(err: serde_json::error::Error) -> Self {
+            let classification = err.classify();
+            let line = err.line();
+            let column = err.column();
+
+            let message = format!("({}, {}) - {:?}", line, column, classification);
+
+            ParserError::FailedTypeConversion(message)
         }
     }
 }
