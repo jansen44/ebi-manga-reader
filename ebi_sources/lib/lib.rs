@@ -5,7 +5,7 @@ pub mod yabu;
 
 #[derive(Clone, Debug)]
 pub struct Source {
-    pub name: String,
+    pub identifier: String,
     pub title: String,
     pub description: String,
     pub base_url: String,
@@ -17,7 +17,7 @@ pub struct Manga {
     pub title: String,
     pub thumbnail: String,
     pub url: String,
-    pub source_name: String,
+    pub source_identifier: String,
 }
 
 #[derive(Clone, Debug)]
@@ -26,6 +26,6 @@ pub struct Chapter {
     pub manga_identifier: String,
     pub title: String,
     pub url: String,
-    pub source_name: String,
+    pub source_identifier: String,
 }
 

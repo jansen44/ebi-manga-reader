@@ -210,7 +210,7 @@ impl<'i> Parser {
             manga_identifier: manga.identifier.clone(),
             title,
             url,
-            source_name: manga.source_name.clone(),
+            source_identifier: manga.source_identifier.clone(),
         }))
     }
 }

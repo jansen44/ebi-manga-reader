@@ -20,7 +20,7 @@ impl<'i> Opex {
 
     pub fn source() -> Source {
         Source {
-            name: String::from("opex"),
+            identifier: String::from("opex"),
             title: String::from("One Piece Ex"),
             description: String::from("One Piece Ex | De fã para fã"),
             base_url: String::from("https://onepieceex.net"),
@@ -34,7 +34,7 @@ impl<'i> Opex {
                 title: String::from("One Piece - Histórias de Capa"),
                 thumbnail: String::from("https://onepieceex.net/mangareader/mangas/428/00_c.jpg"),
                 url: String::from("//historias-de-capa"),
-                source_name: Opex::source().name,
+                source_identifier: Opex::source().identifier,
             },
             Manga {
                 identifier: String::from("main"),
@@ -43,7 +43,7 @@ impl<'i> Opex {
                     "https://onepieceex.net/mangareader/sbs/capa/preview/Volume_1.jpg",
                 ),
                 url: String::from("/mangas"),
-                source_name: Opex::source().name,
+                source_identifier: Opex::source().identifier,
             },
             Manga {
                 identifier: String::from("sbs"),
@@ -52,7 +52,7 @@ impl<'i> Opex {
                     "https://onepieceex.net/mangareader/sbs/capa/preview/nao.jpg",
                 ),
                 url: String::from("/sbs"),
-                source_name: Opex::source().name,
+                source_identifier: Opex::source().identifier,
             },
         ])
     }

@@ -72,7 +72,7 @@ impl Parser {
             url,
             title,
             thumbnail,
-            source_name: Yabu::source().name.clone(),
+            source_identifier: Yabu::source().identifier.clone(),
         }
     }
 }

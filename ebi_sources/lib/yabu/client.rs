@@ -67,7 +67,7 @@ impl From<&MangaResponse> for Manga {
 
         Self {
             identifier: manga.slug.clone(),
-            source_name: source.name.clone(),
+            source_identifier: source.identifier.clone(),
             thumbnail: manga.cover.clone(),
             title: manga.title.clone(),
             url: format!("{}/manga/{}", source.base_url, manga.slug),

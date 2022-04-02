@@ -19,7 +19,7 @@ impl<'i> Yabu {
 
     pub fn source() -> Source {
         Source {
-            name: String::from("yabu"),
+            identifier: String::from("yabu"),
             title: String::from("Manga Yabu"),
             description: String::from("Manga Yabu! - Ler Mangás Online"),
             base_url: String::from("https://mangayabu.top"),
