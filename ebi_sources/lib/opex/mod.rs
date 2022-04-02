@@ -1,7 +1,7 @@
 use crate::errors::Result;
-use crate::Chapter;
-use crate::Manga;
-use crate::Source;
+use crate::CChapter;
+use crate::MManga;
+use crate::SSource;
 
 mod client;
 mod parser;
@@ -18,8 +18,8 @@ impl<'i> Opex {
         Ok(Self { client, parser })
     }
 
-    pub fn source() -> Source {
-        Source {
+    pub fn source() -> SSource {
+        SSource {
             identifier: String::from("opex"),
             title: String::from("One Piece Ex"),
             description: String::from("One Piece Ex | De fã para fã"),
@@ -27,9 +27,9 @@ impl<'i> Opex {
         }
     }
 
-    pub async fn mangas(&self) -> Result<'i, Vec<Manga>> {
+    pub async fn mangas(&self) -> Result<'i, Vec<MManga>> {
         Ok(vec![
-            Manga {
+            MManga {
                 identifier: String::from("covers"),
                 title: String::from("One Piece - Histórias de Capa"),
                 thumbnail: String::from("https://onepieceex.net/mangareader/mangas/428/00_c.jpg"),
@@ -38,7 +38,7 @@ impl<'i> Opex {
                 description: None,
                 genre: None,
             },
-            Manga {
+            MManga {
                 identifier: String::from("main"),
                 title: String::from("One Piece"),
                 thumbnail: String::from(
@@ -49,7 +49,7 @@ impl<'i> Opex {
                 description: None,
                 genre: None,
             },
-            Manga {
+            MManga {
                 identifier: String::from("sbs"),
                 title: String::from("One Piece - SBS"),
                 thumbnail: String::from(
@@ -63,7 +63,7 @@ impl<'i> Opex {
         ])
     }
 
-    pub async fn manga(&self, identifier: &str) -> Result<'i, Option<Manga>> {
+    pub async fn manga(&self, identifier: &str) -> Result<'i, Option<MManga>> {
         let mangas = self.mangas().await?;
         let manga = mangas.iter().find(|el| el.identifier == identifier);
         match manga {
@@ -72,13 +72,13 @@ impl<'i> Opex {
         }
     }
 
-    pub async fn chapters(&self, manga: &Manga) -> Result<'i, Vec<Chapter>> {
+    pub async fn chapters(&self, manga: &MManga) -> Result<'i, Vec<CChapter>> {
         let page = self.client.get_manga_web_page(manga).await?;
         let chapters = self.parser.get_chapter_list(manga, page.as_str())?;
         Ok(chapters)
     }
 
-    pub async fn chapter(&self, manga: &Manga, id: usize) -> Result<'i, Option<Chapter>> {
+    pub async fn chapter(&self, manga: &MManga, id: usize) -> Result<'i, Option<CChapter>> {
         let chapters = self.chapters(manga).await?;
         let mut chapters = chapters.iter();
 
@@ -91,7 +91,7 @@ impl<'i> Opex {
         Ok(Some(chapter.to_owned()))
     }
 
-    pub async fn pages(&self, chapter: &Chapter) -> Result<'i, Vec<String>> {
+    pub async fn pages(&self, chapter: &CChapter) -> Result<'i, Vec<String>> {
         let page = self.client.get_chapter_web_page(chapter).await?;
         let pages = self.parser.get_page_list(page.as_str())?;
         Ok(pages)

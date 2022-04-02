@@ -1,6 +1,6 @@
 use crate::errors::Result;
-use crate::Manga;
-use crate::Source;
+use crate::MManga;
+use crate::SSource;
 
 mod client;
 mod parser;
@@ -17,8 +17,8 @@ impl<'i> Yabu {
         Ok(Self { client, parser })
     }
 
-    pub fn source() -> Source {
-        Source {
+    pub fn source() -> SSource {
+        SSource {
             identifier: String::from("yabu"),
             title: String::from("Manga Yabu"),
             description: String::from("Manga Yabu! - Ler Mangás Online"),
@@ -26,7 +26,7 @@ impl<'i> Yabu {
         }
     }
 
-    pub async fn mangas(&self) -> Result<'i, Vec<Manga>> {
+    pub async fn mangas(&self) -> Result<'i, Vec<MManga>> {
         let body = self.client.get_manga_list().await?;
         Ok(body)
     }

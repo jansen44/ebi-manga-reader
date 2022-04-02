@@ -3,7 +3,7 @@ use std::collections::HashMap;
 use scraper::{ElementRef, Html, Selector};
 
 use crate::errors::parser::{ParserError, ParserResult};
-use crate::{Chapter, Manga};
+use crate::{CChapter, MManga};
 
 const MAIN_CHAPTER_LIST_SELECTOR: &str = "#volumes div.capitulos li.volume-capitulo";
 const SBS_CHAPTER_LIST_SELECTOR: &str =
@@ -27,9 +27,9 @@ impl<'i> Parser {
 
     pub fn get_chapter_list(
         &self,
-        manga: &Manga,
+        manga: &MManga,
         manga_page_body: &str,
-    ) -> ParserResult<'i, Vec<Chapter>> {
+    ) -> ParserResult<'i, Vec<CChapter>> {
         let page = Html::parse_document(manga_page_body);
 
         let selector = self.chapter_list_selectors.get(&manga.identifier);
@@ -190,9 +190,9 @@ impl<'i> Parser {
     }
 
     fn chapter_from_element(
-        manga: &Manga,
+        manga: &MManga,
         element: ElementRef,
-    ) -> ParserResult<'i, Option<Chapter>> {
+    ) -> ParserResult<'i, Option<CChapter>> {
         let info = match manga.identifier.as_str() {
             "main" => Some(Self::main_chapter_info_from_element(element)),
             "sbs" => Some(Self::sbs_chapter_info_from_element(element)),
@@ -205,7 +205,7 @@ impl<'i> Parser {
         }
 
         let (id, title, url) = info.unwrap()?;
-        Ok(Some(Chapter {
+        Ok(Some(CChapter {
             id,
             manga_identifier: manga.identifier.clone(),
             title,

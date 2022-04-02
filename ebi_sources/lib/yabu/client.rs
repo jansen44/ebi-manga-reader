@@ -3,7 +3,7 @@ use reqwest::header::HeaderMap;
 use reqwest::Client;
 
 use crate::errors::client::ClientResult;
-use crate::{Manga, Source};
+use crate::{MManga, SSource};
 
 use super::Yabu;
 
@@ -17,7 +17,7 @@ pub struct YabuClient {
 }
 
 impl YabuClient {
-    pub fn new(source: Source) -> ClientResult<Self> {
+    pub fn new(source: SSource) -> ClientResult<Self> {
         let headers = Self::build_default_headers();
         let api_client = Client::builder().default_headers(headers).build().unwrap();
 
@@ -38,7 +38,7 @@ impl YabuClient {
         headers
     }
 
-    pub async fn get_manga_list(&self) -> ClientResult<Vec<Manga>> {
+    pub async fn get_manga_list(&self) -> ClientResult<Vec<MManga>> {
         let url = format!("{}/api/show3.php", self.base_url.clone());
         let body: MangaListResponse = self.api_client.get(url).send().await?.json().await?;
 
@@ -60,7 +60,7 @@ struct MangaResponse {
     pub slug: String,
 }
 
-impl From<&MangaResponse> for Manga {
+impl From<&MangaResponse> for MManga {
     fn from(manga: &MangaResponse) -> Self {
         let source = Yabu::source();
 
@@ -86,13 +86,13 @@ impl From<MangaListResponse> for Vec<MangaResponse> {
     }
 }
 
-impl From<MangaListResponse> for Vec<Manga> {
+impl From<MangaListResponse> for Vec<MManga> {
     fn from(manga_list: MangaListResponse) -> Self {
         let manga_list: Vec<MangaResponse> = manga_list.into();
         
         manga_list
             .iter()
-            .map(|m| Manga::from(m))
-            .collect::<Vec<Manga>>()
+            .map(|m| MManga::from(m))
+            .collect::<Vec<MManga>>()
     }
 }

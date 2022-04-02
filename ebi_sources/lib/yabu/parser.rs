@@ -1,6 +1,6 @@
 use scraper::{ElementRef, Html, Selector};
 
-use crate::Manga;
+use crate::MManga;
 
 use super::Yabu;
 
