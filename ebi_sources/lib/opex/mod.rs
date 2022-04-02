@@ -3,6 +3,9 @@ use crate::CChapter;
 use crate::MManga;
 use crate::SSource;
 
+pub mod source;
+pub mod manga;
+
 mod client;
 mod parser;
 
@@ -13,7 +16,7 @@ pub struct Opex {
 
 impl<'i> Opex {
     pub fn new() -> Result<'i, Self> {
-        let client = client::OpexClient::new(Opex::source());
+        let client = client::OpexClient::new(Opex::source().base_url.clone());
         let parser = parser::Parser::new();
         Ok(Self { client, parser })
     }

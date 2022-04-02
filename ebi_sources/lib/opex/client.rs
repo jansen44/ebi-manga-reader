@@ -3,7 +3,7 @@ use reqwest::header::HeaderMap;
 use reqwest::Client;
 
 use crate::errors::client::ClientResult;
-use crate::{CChapter, MManga, SSource};
+use crate::{CChapter, MManga};
 
 const ACCEPT_HEADER: &str = "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9";
 const REFERER_HEADER: &str = "https://onepieceex.net/";
@@ -15,10 +15,9 @@ pub struct OpexClient {
 }
 
 impl OpexClient {
-    pub fn new(source: SSource) -> Self {
+    pub fn new(base_url: String) -> Self {
         let headers = Self::build_default_headers();
         let client = Client::builder().default_headers(headers).build().unwrap();
-        let base_url = source.base_url;
 
         Self { client, base_url }
     }

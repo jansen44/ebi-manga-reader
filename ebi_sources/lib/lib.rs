@@ -46,7 +46,7 @@ pub trait ChapterData<'t> {
     async fn page_list(&self) -> Result<'t, Vec<String>>;
 }
 
-pub trait Chapter<'t>: ChapterInfo + ChapterData<'t> {}
+pub trait Chapter<'t>: ChapterInfo + ChapterData<'t> + std::fmt::Display + std::fmt::Debug {}
 pub type BoxedChapterList<'t> = Vec<Box<dyn Chapter<'t>>>;
 pub type BoxedOptionalChapter<'t> = Option<Box<dyn Chapter<'t>>>;
 
@@ -66,7 +66,7 @@ pub trait MangaData<'t> {
     async fn get_chapter(&self, chapter: usize) -> Result<'t, BoxedOptionalChapter<'t>>;
 }
 
-pub trait Manga<'t>: MangaInfo + MangaData<'t> {}
+pub trait Manga<'t>: MangaInfo + MangaData<'t> + std::fmt::Display + std::fmt::Debug {}
 pub type BoxedMangaList<'t> = Vec<Box<dyn Manga<'t>>>;
 pub type BoxedOptionalManga<'t> = Option<Box<dyn Manga<'t>>>;
 
@@ -88,4 +88,4 @@ pub trait SourceData<'t> {
     async fn get_manga(&self, manga_identifier: &str) -> Result<'t, BoxedOptionalManga<'t>>;
 }
 
-pub trait Source<'t>: SourceInfo + SourceData<'t> {}
+pub trait Source<'t>: SourceInfo + SourceData<'t> + std::fmt::Display + std::fmt::Debug {}
