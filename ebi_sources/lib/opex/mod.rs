@@ -30,6 +30,13 @@ impl<'i> Opex {
     pub async fn mangas(&self) -> Result<'i, Vec<Manga>> {
         Ok(vec![
             Manga {
+                identifier: String::from("covers"),
+                title: String::from("One Piece - Histórias de Capa"),
+                thumbnail: String::from("https://onepieceex.net/mangareader/mangas/428/00_c.jpg"),
+                url: String::from("//historias-de-capa"),
+                source_name: Opex::source().name,
+            },
+            Manga {
                 identifier: String::from("main"),
                 title: String::from("One Piece"),
                 thumbnail: String::from(
@@ -40,18 +47,11 @@ impl<'i> Opex {
             },
             Manga {
                 identifier: String::from("sbs"),
-                title: String::from("SBS"),
+                title: String::from("One Piece - SBS"),
                 thumbnail: String::from(
                     "https://onepieceex.net/mangareader/sbs/capa/preview/nao.jpg",
                 ),
                 url: String::from("/sbs"),
-                source_name: Opex::source().name,
-            },
-            Manga {
-                identifier: String::from("covers"),
-                title: String::from("Histórias de Capa"),
-                thumbnail: String::from("https://onepieceex.net/mangareader/mangas/428/00_c.jpg"),
-                url: String::from("//historias-de-capa"),
                 source_name: Opex::source().name,
             },
         ])
