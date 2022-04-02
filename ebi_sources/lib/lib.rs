@@ -35,15 +35,15 @@ pub struct CChapter {
 
 pub trait ChapterInfo {
     fn chapter(&self) -> usize;
-    fn title(&self) -> &str;
-    fn url(&self) -> &str;
-    fn manga_identifier(&self) -> &str;
-    fn source_identifier(&self) -> &str;
+    fn title(&self) -> String;
+    fn url(&self) -> String;
+    fn manga_identifier(&self) -> String;
+    fn source_identifier(&self) -> String;
 }
 
 #[async_trait::async_trait]
 pub trait ChapterData<'t> {
-    async fn page_list(&self) -> Result<'t, Vec<&str>>;
+    async fn page_list(&self) -> Result<'t, Vec<String>>;
 }
 
 pub trait Chapter<'t>: ChapterInfo + ChapterData<'t> {}
@@ -51,19 +51,19 @@ pub type BoxedChapterList<'t> = Vec<Box<dyn Chapter<'t>>>;
 pub type BoxedOptionalChapter<'t> = Option<Box<dyn Chapter<'t>>>;
 
 pub trait MangaInfo {
-    fn identifier(&self) -> &str;
-    fn title(&self) -> &str;
-    fn cover(&self) -> &str;
-    fn url(&self) -> &str;
+    fn identifier(&self) -> String;
+    fn title(&self) -> String;
+    fn cover(&self) -> String;
+    fn url(&self) -> String;
     fn genre(&self) -> Option<String>;
     fn description(&self) -> Option<String>;
-    fn source_identifier(&self) -> &str;
+    fn source_identifier(&self) -> String;
 }
 
 #[async_trait::async_trait]
 pub trait MangaData<'t> {
     async fn chapter_list(&self) -> Result<'t, BoxedChapterList>;
-    async fn get_chapter(&self, chapter: usize) -> Result<'t, BoxedOptionalChapter>;
+    async fn get_chapter(&self, chapter: usize) -> Result<'t, BoxedOptionalChapter<'t>>;
 }
 
 pub trait Manga<'t>: MangaInfo + MangaData<'t> {}
@@ -71,10 +71,10 @@ pub type BoxedMangaList<'t> = Vec<Box<dyn Manga<'t>>>;
 pub type BoxedOptionalManga<'t> = Option<Box<dyn Manga<'t>>>;
 
 pub trait SourceInfo {
-    fn identifier(&self) -> &str;
-    fn title(&self) -> &str;
-    fn description(&self) -> &str;
-    fn base_url(&self) -> &str;
+    fn identifier(&self) -> String;
+    fn title(&self) -> String;
+    fn description(&self) -> String;
+    fn base_url(&self) -> String;
 }
 
 #[async_trait::async_trait]
