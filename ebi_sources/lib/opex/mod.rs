@@ -35,6 +35,8 @@ impl<'i> Opex {
                 thumbnail: String::from("https://onepieceex.net/mangareader/mangas/428/00_c.jpg"),
                 url: String::from("//historias-de-capa"),
                 source_identifier: Opex::source().identifier,
+                description: None,
+                genre: None,
             },
             Manga {
                 identifier: String::from("main"),
@@ -44,6 +46,8 @@ impl<'i> Opex {
                 ),
                 url: String::from("/mangas"),
                 source_identifier: Opex::source().identifier,
+                description: None,
+                genre: None,
             },
             Manga {
                 identifier: String::from("sbs"),
@@ -53,6 +57,8 @@ impl<'i> Opex {
                 ),
                 url: String::from("/sbs"),
                 source_identifier: Opex::source().identifier,
+                description: None,
+                genre: None,
             },
         ])
     }

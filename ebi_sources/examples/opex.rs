@@ -20,15 +20,15 @@ async fn main() -> Result<'static, ()> {
     }
     println!("Manga: {:?}", manga);
 
-    for chapter in chapters {
-        println!("{:?}", chapter);
-    }
+    // for chapter in chapters {
+    //     println!("{:?}", chapter);
+    // }
 
-    println!("Chapter 7: {:?}", chapter);
+    // println!("Chapter 7: {:?}", chapter);
 
-    for page in pages {
-        println!("{:?}", page);
-    }
+    // for page in pages {
+    //     println!("{:?}", page);
+    // }
 
     Ok(())
 }

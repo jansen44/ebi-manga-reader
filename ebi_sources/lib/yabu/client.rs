@@ -51,8 +51,7 @@ struct MangaResponse {
     #[serde(rename = "hash")]
     pub _hash: u32,
     pub title: String,
-    #[serde(rename = "genre")]
-    pub _genre: String,
+    pub genre: String,
     #[serde(rename = "videos")]
     pub _videos: u32,
     pub cover: String,
@@ -71,6 +70,8 @@ impl From<&MangaResponse> for Manga {
             thumbnail: manga.cover.clone(),
             title: manga.title.clone(),
             url: format!("{}/manga/{}", source.base_url, manga.slug),
+            genre: Some(manga.genre.clone()),
+            description: None,
         }
     }
 }

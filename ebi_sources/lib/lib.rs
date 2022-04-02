@@ -18,6 +18,8 @@ pub struct Manga {
     pub thumbnail: String,
     pub url: String,
     pub source_identifier: String,
+    pub genre: Option<String>,
+    pub description: Option<String>,
 }
 
 #[derive(Clone, Debug)]
