@@ -6,7 +6,9 @@ async fn main() -> Result<'static, ()> {
     let yabu = Yabu::new()?;
     let manga_list = yabu.mangas().await?;
 
-    println!("{:?}", manga_list);
+    for manga in manga_list.iter() {
+        println!("{:?}", manga);
+    }
 
     Ok(())
 }

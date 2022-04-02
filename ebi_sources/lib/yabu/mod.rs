@@ -28,7 +28,6 @@ impl<'i> Yabu {
 
     pub async fn mangas(&self) -> Result<'i, Vec<Manga>> {
         let body = self.client.get_manga_list().await?;
-        let manga_list = self.parser.popular_manga_from_page(body.as_str());
-        Ok(manga_list)
+        Ok(body)
     }
 }
