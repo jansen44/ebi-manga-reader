@@ -1,6 +1,6 @@
 use crate::errors::Result;
 use crate::Source as SourceTrait;
-use crate::{BoxedMangaList, BoxedOptionalManga};
+use crate::{BoxedMangaList, OptionalBoxedManga};
 use crate::{SourceData, SourceInfo};
 
 #[derive(Debug)]
@@ -36,19 +36,19 @@ impl std::fmt::Display for Source {
 
 impl SourceInfo for Source {
     fn identifier(&self) -> String {
-        todo!()
+        self.identifier.clone()
     }
 
     fn title(&self) -> String {
-        todo!()
+        self.title.clone()
     }
 
     fn description(&self) -> String {
-        todo!()
+        self.description.clone()
     }
 
     fn base_url(&self) -> String {
-        todo!()
+        self.base_url.clone()
     }
 }
 
@@ -74,7 +74,7 @@ impl<'t> SourceData<'t> for Source {
         todo!()
     }
 
-    async fn get_manga(&self, _manga_identifier: &str) -> Result<'t, BoxedOptionalManga<'t>> {
+    async fn get_manga(&self, _manga_identifier: &str) -> Result<'t, OptionalBoxedManga<'t>> {
         todo!()
     }
 }
