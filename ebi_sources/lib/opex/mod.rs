@@ -5,6 +5,7 @@ use crate::SSource;
 
 pub mod source;
 pub mod manga;
+pub mod chapter;
 
 mod client;
 mod parser;

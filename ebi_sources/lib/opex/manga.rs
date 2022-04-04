@@ -1,3 +1,4 @@
+#[derive(Default)]
 pub struct Manga {
     pub identifier: String,
     pub title: String,
@@ -10,15 +11,7 @@ pub struct Manga {
 
 impl Manga {
     pub fn builder() -> Self {
-        Self {
-            identifier: String::new(),
-            title: String::new(),
-            cover: String::new(),
-            url: String::new(),
-            genre: None,
-            description: None,
-            source_identifier: String::new(),
-        }
+        Self { ..Default::default() }
     }
 
     pub fn with_identifier(mut self, identifier: &str) -> Self {
