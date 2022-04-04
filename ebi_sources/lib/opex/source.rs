@@ -1,3 +1,9 @@
+use crate::errors::Result;
+use crate::Source as SourceTrait;
+use crate::{BoxedMangaList, BoxedOptionalManga};
+use crate::{SourceData, SourceInfo};
+
+#[derive(Debug)]
 pub struct Source {
     pub identifier: String,
     pub title: String,
@@ -17,3 +23,60 @@ impl Source {
         }
     }
 }
+
+impl std::fmt::Display for Source {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(
+            f,
+            "Source {} ({}) - {} - {}",
+            self.title, self.identifier, self.base_url, self.description
+        )
+    }
+}
+
+impl SourceInfo for Source {
+    fn identifier(&self) -> String {
+        todo!()
+    }
+
+    fn title(&self) -> String {
+        todo!()
+    }
+
+    fn description(&self) -> String {
+        todo!()
+    }
+
+    fn base_url(&self) -> String {
+        todo!()
+    }
+}
+
+#[async_trait::async_trait]
+impl<'t> SourceData<'t> for Source {
+    async fn manga_list(&self) -> Result<'t, BoxedMangaList<'t>> {
+        todo!()
+    }
+
+    async fn latest_manga(&self) -> Result<'t, BoxedMangaList<'t>> {
+        todo!()
+    }
+
+    async fn popular_manga(&self) -> Result<'t, BoxedMangaList<'t>> {
+        todo!()
+    }
+
+    async fn hot_manga(&self) -> Result<'t, BoxedMangaList<'t>> {
+        todo!()
+    }
+
+    async fn search_manga(&self, _manga_title: &str) -> Result<'t, BoxedMangaList<'t>> {
+        todo!()
+    }
+
+    async fn get_manga(&self, _manga_identifier: &str) -> Result<'t, BoxedOptionalManga<'t>> {
+        todo!()
+    }
+}
+
+impl<'t> SourceTrait<'t> for Source {}
