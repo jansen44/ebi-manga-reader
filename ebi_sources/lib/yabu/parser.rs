@@ -1,24 +1,22 @@
-use scraper::{ElementRef, Html, Selector};
+// use scraper::{ElementRef, Html, Selector};
 
-use crate::MManga;
+// use crate::MManga;
 
-use super::Yabu;
+// pub struct Parser {
+//     manga_card_selector: Selector,
+//     popular_manga_list_container_selector: Selector,
+// }
 
-pub struct Parser {
-    manga_card_selector: Selector,
-    popular_manga_list_container_selector: Selector,
-}
+// impl Parser {
+//     pub fn new() -> Self {
+//         let manga_card_selector = Selector::parse(".manga-card").unwrap();
 
-impl Parser {
-    pub fn new() -> Self {
-        let manga_card_selector = Selector::parse(".manga-card").unwrap();
+//         let popular_manga_list_container_selector =
+//             Selector::parse("#main > .row > .carousel.s12").unwrap();
 
-        let popular_manga_list_container_selector =
-            Selector::parse("#main > .row > .carousel.s12").unwrap();
-
-        Self {
-            manga_card_selector,
-            popular_manga_list_container_selector,
-        }
-    }
-}
+//         Self {
+//             manga_card_selector,
+//             popular_manga_list_container_selector,
+//         }
+//     }
+// }

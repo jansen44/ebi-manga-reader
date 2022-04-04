@@ -6,14 +6,6 @@ pub mod yabu;
 use errors::Result;
 
 #[derive(Clone, Debug)]
-pub struct SSource {
-    pub identifier: String,
-    pub title: String,
-    pub description: String,
-    pub base_url: String,
-}
-
-#[derive(Clone, Debug)]
 pub struct MManga {
     pub identifier: String,
     pub title: String,
