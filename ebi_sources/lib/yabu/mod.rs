@@ -41,23 +41,23 @@ impl SourceInfo for YabuSource {
 
 #[async_trait::async_trait]
 impl SourceData for YabuSource {
-    async fn manga_list(&self) -> Result<Box<dyn Manga>> {
+    async fn manga_list(&self) -> Result<Vec<Box<dyn Manga>>> {
         todo!()
     }
 
-    async fn latest_manga(&self) -> Result<Box<dyn Manga>> {
+    async fn latest_manga(&self) -> Result<Vec<Box<dyn Manga>>> {
         todo!()
     }
 
-    async fn popular_manga(&self) -> Result<Box<dyn Manga>> {
+    async fn popular_manga(&self) -> Result<Vec<Box<dyn Manga>>> {
         todo!()
     }
 
-    async fn hot_manga(&self) -> Result<Box<dyn Manga>> {
+    async fn hot_manga(&self) -> Result<Vec<Box<dyn Manga>>> {
         todo!()
     }
 
-    async fn search_manga(&self, _manga_title: &str) -> Result<Box<dyn Manga>> {
+    async fn search_manga(&self, _manga_title: &str) -> Result<Vec<Box<dyn Manga>>> {
         todo!()
     }
 

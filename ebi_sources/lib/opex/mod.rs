@@ -45,23 +45,47 @@ impl SourceInfo for OpexSource {
 
 #[async_trait::async_trait]
 impl SourceData for OpexSource {
-    async fn manga_list(&self) -> Result<Box<dyn Manga>> {
+    async fn manga_list(&self) -> Result<Vec<Box<dyn Manga>>> {
+        let cover = manga::OpexMangaBuilder::new()
+            .with_identifier("covers")
+            .with_title("One Piece - Histórias de Capa")
+            .with_cover("https://onepieceex.net/mangareader/mangas/428/00_c.jpg")
+            .with_url("/historias-de-capa")
+            .build();
+        let cover: Box<dyn Manga> = Box::new(cover);
+
+        let main = manga::OpexMangaBuilder::new()
+            .with_identifier("main")
+            .with_title("One Piece")
+            .with_cover("https://onepieceex.net/mangareader/sbs/capa/preview/Volume_1.jpg")
+            .with_url("/mangas")
+            .build();
+        let main: Box<dyn Manga> = Box::new(main);
+
+        let sbs = manga::OpexMangaBuilder::new()
+            .with_identifier("sbs")
+            .with_title("One Piece - SBS")
+            .with_cover("https://onepieceex.net/mangareader/sbs/capa/preview/nao.jpg")
+            .with_url("/sbs")
+            .build();
+        let sbs: Box<dyn Manga> = Box::new(sbs);
+
+        Ok(vec![cover, main, sbs])
+    }
+
+    async fn latest_manga(&self) -> Result<Vec<Box<dyn Manga>>> {
         todo!()
     }
 
-    async fn latest_manga(&self) -> Result<Box<dyn Manga>> {
+    async fn popular_manga(&self) -> Result<Vec<Box<dyn Manga>>> {
         todo!()
     }
 
-    async fn popular_manga(&self) -> Result<Box<dyn Manga>> {
+    async fn hot_manga(&self) -> Result<Vec<Box<dyn Manga>>> {
         todo!()
     }
 
-    async fn hot_manga(&self) -> Result<Box<dyn Manga>> {
-        todo!()
-    }
-
-    async fn search_manga(&self, _manga_title: &str) -> Result<Box<dyn Manga>> {
+    async fn search_manga(&self, _manga_title: &str) -> Result<Vec<Box<dyn Manga>>> {
         todo!()
     }
 
