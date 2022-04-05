@@ -2,6 +2,8 @@ use crate::Manga;
 use crate::Result;
 use crate::{Source, SourceData, SourceInfo};
 
+pub mod manga;
+
 #[derive(Debug, Clone)]
 pub struct OpexSource {
     pub identifier: String,
