@@ -1,4 +1,8 @@
+use crate::Chapter;
+use crate::Result;
 use crate::{Manga, MangaData, MangaInfo};
+
+use super::OPEX_SOURCE_IDENTIFIER;
 
 #[derive(Default)]
 pub struct OpexMangaBuilder {
@@ -6,7 +10,6 @@ pub struct OpexMangaBuilder {
     title: Option<String>,
     cover: Option<String>,
     url: Option<String>,
-    source_identifier: Option<String>,
 }
 
 impl OpexMangaBuilder {
@@ -36,18 +39,12 @@ impl OpexMangaBuilder {
         self
     }
 
-    pub fn with_source(mut self, source: &str) -> Self {
-        self.source_identifier = Some(source.to_owned());
-        self
-    }
-
     pub fn build(&self) -> OpexManga {
         OpexManga {
             identifier: self.identifier.clone().unwrap_or_default(),
             title: self.title.clone().unwrap_or_default(),
             cover: self.cover.clone().unwrap_or_default(),
             url: self.url.clone().unwrap_or_default(),
-            source_identifier: self.source_identifier.clone().unwrap_or_default(),
         }
     }
 }
@@ -58,46 +55,46 @@ pub struct OpexManga {
     pub title: String,
     pub cover: String,
     pub url: String,
-    pub source_identifier: String,
 }
 
-// impl Manga {
-//     pub fn builder() -> Self {
-//         Self { ..Default::default() }
-//     }
+impl MangaInfo for OpexManga {
+    fn identifier(&self) -> String {
+        self.identifier.clone()
+    }
 
-//     pub fn with_identifier(mut self, identifier: &str) -> Self {
-//         self.identifier = identifier.to_owned();
-//         self
-//     }
+    fn title(&self) -> String {
+        self.title.clone()
+    }
 
-//     pub fn with_title(mut self, title: &str) -> Self {
-//         self.title = title.to_owned();
-//         self
-//     }
+    fn cover(&self) -> String {
+        self.cover.clone()
+    }
 
-//     pub fn with_cover(mut self, cover: &str) -> Self {
-//         self.cover = cover.to_owned();
-//         self
-//     }
+    fn url(&self) -> String {
+        self.url.clone()
+    }
 
-//     pub fn with_url(mut self, url: &str) -> Self {
-//         self.url = url.to_owned();
-//         self
-//     }
+    fn genre(&self) -> Option<String> {
+        None
+    }
 
-//     pub fn with_genre(mut self, genre: &str) -> Self {
-//         self.genre = Some(genre.to_owned());
-//         self
-//     }
+    fn description(&self) -> Option<String> {
+        None
+    }
 
-//     pub fn with_description(mut self, description: &str) -> Self {
-//         self.description = Some(description.to_owned());
-//         self
-//     }
+    fn source_identifier(&self) -> String {
+        OPEX_SOURCE_IDENTIFIER.to_owned()
+    }
+}
 
-//     pub fn with_source(mut self, source_identifier: &str) -> Self {
-//         self.source_identifier = source_identifier.to_owned();
-//         self
-//     }
-// }
+#[async_trait::async_trait]
+impl MangaData for OpexManga {
+    async fn chapter_list(&self) -> Result<Vec<Box<dyn Chapter>>> {
+        todo!()
+    }
+    async fn get_chapter(&self, _chapter: usize) -> Result<Option<Box<dyn Chapter>>> {
+        todo!()
+    }
+}
+
+impl Manga for OpexManga {}

@@ -4,6 +4,8 @@ use crate::{Source, SourceData, SourceInfo};
 
 pub mod manga;
 
+const OPEX_SOURCE_IDENTIFIER: &str = "opex";
+
 #[derive(Debug, Clone)]
 pub struct OpexSource {
     pub identifier: String,
@@ -16,7 +18,7 @@ impl OpexSource {
     pub fn default() -> Self {
         Self {
             base_url: String::from("https://onepieceex.net"),
-            identifier: String::from("opex"),
+            identifier: OPEX_SOURCE_IDENTIFIER.to_owned(),
             title: String::from("One Piece Ex"),
             description: String::from("One Piece Ex | De fã para fã"),
         }
