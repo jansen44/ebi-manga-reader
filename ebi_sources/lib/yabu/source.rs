@@ -3,34 +3,6 @@
 // use crate::{BoxedMangaList, OptionalBoxedManga};
 // use crate::{SourceData, SourceInfo};
 
-#[derive(Debug)]
-pub struct Source {
-    pub identifier: String,
-    pub title: String,
-    pub description: String,
-    pub base_url: String,
-}
-
-impl Source {
-    pub fn new() -> Self {
-        Self {
-            base_url: String::from("https://mangayabu.top"),
-            identifier: String::from("yabu"),
-            title: String::from("Manga Yabu"),
-            description: String::from("Manga Yabu! - Ler Mangás Online"),
-        }
-    }
-}
-
-impl std::fmt::Display for Source {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        write!(
-            f,
-            "Source {} ({}) - {} - {}",
-            self.title, self.identifier, self.base_url, self.description
-        )
-    }
-}
 
 // impl SourceInfo for Source {
 //     fn identifier(&self) -> String {

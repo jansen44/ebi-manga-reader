@@ -1,11 +1,83 @@
+use crate::Manga;
+use crate::Result;
+use crate::{Source, SourceData, SourceInfo};
+
+#[derive(Debug, Clone)]
+pub struct OpexSource {
+    pub identifier: String,
+    pub title: String,
+    pub description: String,
+    pub base_url: String,
+}
+
+impl OpexSource {
+    pub fn default() -> Self {
+        Self {
+            base_url: String::from("https://onepieceex.net"),
+            identifier: String::from("opex"),
+            title: String::from("One Piece Ex"),
+            description: String::from("One Piece Ex | De fã para fã"),
+        }
+    }
+}
+
+impl SourceInfo for OpexSource {
+    fn identifier(&self) -> String {
+        self.identifier.clone()
+    }
+
+    fn title(&self) -> String {
+        self.title.clone()
+    }
+
+    fn description(&self) -> String {
+        self.description.clone()
+    }
+
+    fn base_url(&self) -> String {
+        self.base_url.clone()
+    }
+}
+
+#[async_trait::async_trait]
+impl SourceData for OpexSource {
+    async fn manga_list(&self) -> Result<Box<dyn Manga>> {
+        todo!()
+    }
+
+    async fn latest_manga(&self) -> Result<Box<dyn Manga>> {
+        todo!()
+    }
+
+    async fn popular_manga(&self) -> Result<Box<dyn Manga>> {
+        todo!()
+    }
+
+    async fn hot_manga(&self) -> Result<Box<dyn Manga>> {
+        todo!()
+    }
+
+    async fn search_manga(&self, _manga_title: &str) -> Result<Box<dyn Manga>> {
+        todo!()
+    }
+
+    async fn get_manga(&self, _manga_identifier: &str) -> Result<Option<Box<dyn Manga>>> {
+        todo!()
+    }
+}
+
+impl Source for OpexSource {}
+
+// ==========================================================
+
 // use crate::errors::Result;
 // use crate::CChapter;
 // use crate::MManga;
 // use crate::SSource;
 
-pub mod source;
-pub mod manga;
-pub mod chapter;
+// pub mod source;
+// pub mod manga;
+// pub mod chapter;
 
 // mod client;
 // mod parser;

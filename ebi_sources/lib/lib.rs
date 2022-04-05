@@ -3,79 +3,57 @@ pub mod errors;
 pub mod opex;
 pub mod yabu;
 
-#[derive(Clone, Debug)]
-pub struct MManga {
-    pub identifier: String,
-    pub title: String,
-    pub thumbnail: String,
-    pub url: String,
-    pub source_identifier: String,
-    pub genre: Option<String>,
-    pub description: Option<String>,
+use errors::Result;
+
+pub trait ChapterInfo {
+    fn chapter(&self) -> usize;
+    fn title(&self) -> String;
+    fn url(&self) -> String;
+    fn manga_identifier(&self) -> String;
+    fn source_identifier(&self) -> String;
 }
 
-#[derive(Clone, Debug)]
-pub struct CChapter {
-    pub id: usize,
-    pub title: String,
-    pub url: String,
-    pub manga_identifier: String,
-    pub source_identifier: String,
+#[async_trait::async_trait]
+pub trait ChapterData {
+    async fn page_list(&self) -> Result<Vec<String>>;
 }
 
-// pub trait ChapterInfo {
-//     fn chapter(&self) -> usize;
-//     fn title(&self) -> String;
-//     fn url(&self) -> String;
-//     fn manga_identifier(&self) -> String;
-//     fn source_identifier(&self) -> String;
-// }
+pub trait Chapter: ChapterInfo + ChapterData + std::fmt::Debug {}
 
-// #[async_trait::async_trait]
-// pub trait ChapterData<'t> {
-//     async fn page_list(&self) -> Result<'t, Vec<String>>;
-// }
+pub trait MangaInfo {
+    fn identifier(&self) -> String;
+    fn title(&self) -> String;
+    fn cover(&self) -> String;
+    fn url(&self) -> String;
+    fn genre(&self) -> Option<String>;
+    fn description(&self) -> Option<String>;
+    fn source_identifier(&self) -> String;
+}
 
-// pub trait Chapter<'t>: ChapterInfo + ChapterData<'t> + std::fmt::Display + std::fmt::Debug {}
-// pub type BoxedChapterList<'t> = Vec<Box<dyn Chapter<'t>>>;
-// pub type OptionalBoxedChapter<'t> = Option<Box<dyn Chapter<'t>>>;
+#[async_trait::async_trait]
+pub trait MangaData {
+    async fn chapter_list(&self) -> Result<Vec<Box<dyn Chapter>>>;
+    async fn get_chapter(&self, chapter: usize) -> Result<Option<Box<dyn Chapter>>>;
+}
 
-// pub trait MangaInfo {
-//     fn identifier(&self) -> String;
-//     fn title(&self) -> String;
-//     fn cover(&self) -> String;
-//     fn url(&self) -> String;
-//     fn genre(&self) -> Option<String>;
-//     fn description(&self) -> Option<String>;
-//     fn source_identifier(&self) -> String;
-// }
+pub trait Manga: MangaInfo + MangaData + std::fmt::Debug {}
 
-// #[async_trait::async_trait]
-// pub trait MangaData<'t> {
-//     async fn chapter_list(&self) -> Result<'t, BoxedChapterList>;
-//     async fn get_chapter(&self, chapter: usize) -> Result<'t, OptionalBoxedChapter<'t>>;
-// }
+pub trait SourceInfo {
+    fn identifier(&self) -> String;
+    fn title(&self) -> String;
+    fn description(&self) -> String;
+    fn base_url(&self) -> String;
+}
 
-// pub trait Manga<'t>: MangaInfo + MangaData<'t> + std::fmt::Display + std::fmt::Debug {}
-// pub type BoxedMangaList<'t> = Vec<Box<dyn Manga<'t>>>;
-// pub type OptionalBoxedManga<'t> = Option<Box<dyn Manga<'t>>>;
+#[async_trait::async_trait]
+pub trait SourceData {
+    async fn manga_list(&self) -> Result<Box<dyn Manga>>;
+    async fn latest_manga(&self) -> Result<Box<dyn Manga>>;
+    async fn popular_manga(&self) -> Result<Box<dyn Manga>>;
+    async fn hot_manga(&self) -> Result<Box<dyn Manga>>;
 
-// pub trait SourceInfo {
-//     fn identifier(&self) -> String;
-//     fn title(&self) -> String;
-//     fn description(&self) -> String;
-//     fn base_url(&self) -> String;
-// }
+    async fn search_manga(&self, manga_title: &str) -> Result<Box<dyn Manga>>;
+    async fn get_manga(&self, manga_identifier: &str) -> Result<Option<Box<dyn Manga>>>;
+}
 
-// #[async_trait::async_trait]
-// pub trait SourceData<'t> {
-//     async fn manga_list(&self) -> Result<'t, BoxedMangaList<'t>>;
-//     async fn latest_manga(&self) -> Result<'t, BoxedMangaList<'t>>;
-//     async fn popular_manga(&self) -> Result<'t, BoxedMangaList<'t>>;
-//     async fn hot_manga(&self) -> Result<'t, BoxedMangaList<'t>>;
-
-//     async fn search_manga(&self, manga_title: &str) -> Result<'t, BoxedMangaList<'t>>;
-//     async fn get_manga(&self, manga_identifier: &str) -> Result<'t, OptionalBoxedManga<'t>>;
-// }
-
-// pub trait Source<'t>: SourceInfo + SourceData<'t> + std::fmt::Display + std::fmt::Debug {}
+pub trait Source: SourceInfo + SourceData + std::fmt::Debug {}
