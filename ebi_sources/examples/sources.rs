@@ -1,7 +1,7 @@
-use ebi_sources::errors::Result;
-use ebi_sources::Source;
 use ebi_sources::opex::OpexSource;
+use ebi_sources::source::Source;
 use ebi_sources::yabu::YabuSource;
+use ebi_sources::Result;
 
 #[tokio::main]
 async fn main() -> Result<()> {

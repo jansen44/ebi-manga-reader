@@ -1,4 +1,4 @@
-use crate::errors::Result;
+use crate::Result;
 use crate::Chapter;
 
 pub trait MangaInfo {

@@ -1,6 +1,6 @@
 use crate::manga::Manga;
+use crate::source::{Source, SourceData, SourceInfo};
 use crate::Result;
-use crate::{Source, SourceData, SourceInfo};
 
 pub mod manga;
 

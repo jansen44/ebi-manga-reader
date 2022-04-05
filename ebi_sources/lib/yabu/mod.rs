@@ -1,6 +1,6 @@
 use crate::manga::Manga;
 use crate::Result;
-use crate::{Source, SourceData, SourceInfo};
+use crate::source::{Source, SourceData, SourceInfo};
 
 #[derive(Debug)]
 pub struct YabuSource {
