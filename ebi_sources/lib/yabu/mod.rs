@@ -1,4 +1,4 @@
-use crate::Manga;
+use crate::manga::Manga;
 use crate::Result;
 use crate::{Source, SourceData, SourceInfo};
 

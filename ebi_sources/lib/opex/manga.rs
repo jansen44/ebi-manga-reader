@@ -1,6 +1,6 @@
+use crate::manga::{Manga, MangaData, MangaInfo};
 use crate::Chapter;
 use crate::Result;
-use crate::{Manga, MangaData, MangaInfo};
 
 use super::OPEX_SOURCE_IDENTIFIER;
 
