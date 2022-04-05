@@ -2,6 +2,7 @@ use crate::manga::Manga;
 use crate::source::{Source, SourceData, SourceInfo};
 use crate::Result;
 
+pub mod chapter;
 pub mod manga;
 
 const OPEX_SOURCE_IDENTIFIER: &str = "opex";

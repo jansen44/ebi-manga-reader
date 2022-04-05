@@ -10,7 +10,7 @@ pub trait ChapterInfo {
 
 #[async_trait::async_trait]
 pub trait ChapterData {
-    async fn page_list(&self) -> Result<Vec<String>>;
+    async fn page_url_list(&self) -> Result<Vec<String>>;
 }
 
 pub trait Chapter: ChapterInfo + ChapterData + std::fmt::Debug {}
