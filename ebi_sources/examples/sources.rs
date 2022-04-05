@@ -54,5 +54,9 @@ async fn main() -> Result<()> {
     let manga = sources[0].get_manga("main").await?.unwrap();
     println!("{}", manga);
 
+    println!("\n\n=== Manga Chapter List ===\n");
+    let chapters = manga.chapter_list().await?;
+    println!("{:?}", chapters);
+
     Ok(())
 }

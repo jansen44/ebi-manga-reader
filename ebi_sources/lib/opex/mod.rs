@@ -6,6 +6,7 @@ pub mod chapter;
 pub mod manga;
 
 const OPEX_SOURCE_IDENTIFIER: &str = "opex";
+const OPEX_BASE_URL: &str = "https://onepieceex.net";
 
 #[derive(Debug, Clone)]
 pub struct OpexSource {
@@ -18,7 +19,7 @@ pub struct OpexSource {
 impl OpexSource {
     pub fn default() -> Self {
         Self {
-            base_url: String::from("https://onepieceex.net"),
+            base_url: OPEX_BASE_URL.to_owned(),
             identifier: OPEX_SOURCE_IDENTIFIER.to_owned(),
             title: String::from("One Piece Ex"),
             description: String::from("One Piece Ex | De fã para fã"),
