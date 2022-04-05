@@ -74,23 +74,27 @@ impl SourceData for OpexSource {
     }
 
     async fn latest_manga(&self) -> Result<Vec<Box<dyn Manga>>> {
-        todo!()
+        self.manga_list().await
     }
 
     async fn popular_manga(&self) -> Result<Vec<Box<dyn Manga>>> {
-        todo!()
+        self.manga_list().await
     }
 
     async fn hot_manga(&self) -> Result<Vec<Box<dyn Manga>>> {
-        todo!()
+        self.manga_list().await
     }
 
     async fn search_manga(&self, _manga_title: &str) -> Result<Vec<Box<dyn Manga>>> {
-        todo!()
+        self.manga_list().await
     }
 
-    async fn get_manga(&self, _manga_identifier: &str) -> Result<Option<Box<dyn Manga>>> {
-        todo!()
+    async fn get_manga(&self, manga_identifier: &str) -> Result<Option<Box<dyn Manga>>> {
+        let manga_list = self.manga_list().await?;
+        let manga = manga_list
+            .into_iter()
+            .find(|m| m.identifier() == manga_identifier);
+        Ok(manga)
     }
 }
 
