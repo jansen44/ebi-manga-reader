@@ -1,5 +1,5 @@
 use crate::Result;
-use crate::Chapter;
+use crate::chapter::Chapter;
 
 pub trait MangaInfo {
     fn identifier(&self) -> String;
