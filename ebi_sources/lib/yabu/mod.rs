@@ -2,6 +2,11 @@ use crate::manga::Manga;
 use crate::Result;
 use crate::source::{Source, SourceData, SourceInfo};
 
+pub mod manga;
+
+const YABU_SOURCE_IDENTIFIER: &str = "yabu";
+const YABU_BASE_URL: &str = "https://mangayabu.top";
+
 #[derive(Debug)]
 pub struct YabuSource {
     pub identifier: String,
@@ -13,8 +18,8 @@ pub struct YabuSource {
 impl YabuSource {
     pub fn default() -> Self {
         Self {
-            base_url: String::from("https://mangayabu.top"),
-            identifier: String::from("yabu"),
+            identifier: String::from(YABU_SOURCE_IDENTIFIER),
+            base_url: String::from(YABU_BASE_URL),
             title: String::from("Manga Yabu"),
             description: String::from("Manga Yabu! - Ler Mangás Online"),
         }
@@ -67,12 +72,3 @@ impl SourceData for YabuSource {
 }
 
 impl Source for YabuSource {}
-
-// use crate::errors::Result;
-// use crate::MManga;
-// use crate::SSource;
-
-// pub mod source;
-
-// mod client;
-// mod parser;
