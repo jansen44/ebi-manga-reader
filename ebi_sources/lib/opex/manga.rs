@@ -33,6 +33,146 @@ mod manga_client {
     }
 }
 
+mod manga_parser {
+    use scraper::{ElementRef, Html, Selector};
+
+    use crate::chapter::Chapter;
+    use crate::errors::parser::{ParserError, ParserResult};
+    use crate::opex::chapter::OpexChapter;
+
+    type ChapterInfo = (Option<usize>, String, String);
+
+    fn chapter_list_selectors(manga_identifier: &str) -> Option<Selector> {
+        let selector = match manga_identifier {
+            "main" => Some("#volumes div.capitulos li.volume-capitulo"),
+            "sbs" => Some("#conteudo #post > a.text-uppercase.sombra-clara.bnt-lista-horizontal"),
+            "covers" => Some("#post div.volume.text-uppercase div.capitulos li.volume-capitulo"),
+            _ => None,
+        }?;
+
+        let selector = Selector::parse(selector).unwrap();
+        Some(selector)
+    }
+
+    fn get_child_span_value(element: ElementRef) -> ParserResult<String> {
+        let selector = Selector::parse("span")?;
+        match element.select(&selector).next() {
+            Some(span) => Ok(span.inner_html()),
+            None => Err(ParserError::MissingElement(String::from("span"))),
+        }
+    }
+
+    fn href_from_anchor(element: ElementRef) -> ParserResult<String> {
+        match element.value().attr("href") {
+            Some(href) => Ok(href.to_owned()),
+            None => Err(ParserError::MissingElement(String::from("href"))),
+        }
+    }
+
+    fn chapter_and_title_from_raw_title(base_title: &str) -> ParserResult<(usize, &str)> {
+        let mut id = "";
+        let mut title = "";
+
+        for (i, &item) in base_title.as_bytes().iter().enumerate() {
+            if item == b'.' {
+                id = &base_title[0..i];
+                title = &base_title[i + 2..];
+                break;
+            }
+        }
+
+        let id = id.parse::<usize>()?;
+        Ok((id, title))
+    }
+
+    fn main_chapter_info_from_element(element: ElementRef) -> ParserResult<ChapterInfo> {
+        let base_title = get_child_span_value(element)?;
+
+        let anchor_selector = &Selector::parse("a.online").unwrap();
+        let url = match element.select(&anchor_selector).next() {
+            Some(el) => href_from_anchor(el),
+            None => return Err(ParserError::MissingElement(String::from("a.online"))),
+        }?;
+
+        let (id, title) = chapter_and_title_from_raw_title(base_title.as_str())?;
+        Ok((Some(id), String::from(title), url))
+    }
+
+    fn sbs_chapter_info_from_element(element: ElementRef) -> ParserResult<ChapterInfo> {
+        let title = get_child_span_value(element)?;
+        let url = href_from_anchor(element)?;
+        Ok((None, title, url))
+    }
+
+    fn covers_chapter_info_from_element(element: ElementRef) -> ParserResult<ChapterInfo> {
+        let title = match element.text().next() {
+            Some(t) => t,
+            None => return Err(ParserError::MissingElement(String::from("element text()"))),
+        };
+        let title = (&title[..title.len() - 1]).to_owned();
+
+        let anchor_selector = &Selector::parse("a.online").unwrap();
+        let anchor = match element.select(&anchor_selector).next() {
+            Some(el) => el,
+            None => return Err(ParserError::MissingElement(String::from("a.online"))),
+        };
+        let url = href_from_anchor(anchor)?;
+
+        Ok((None, title, url))
+    }
+
+    fn chapter_from_element(
+        manga_identifier: &str,
+        element: ElementRef,
+        idx: usize,
+    ) -> ParserResult<OpexChapter> {
+        let info = match manga_identifier {
+            "main" => Ok(main_chapter_info_from_element(element)),
+            "sbs" => Ok(sbs_chapter_info_from_element(element)),
+            "covers" => Ok(covers_chapter_info_from_element(element)),
+            _ => Err(ParserError::InvalidParsingTarget(format!(
+                "manga - {}",
+                manga_identifier
+            ))),
+        }?;
+
+        let (id, title, url) = info?;
+        let chapter = if let Some(id) = id { id } else { idx };
+
+        Ok(OpexChapter {
+            chapter,
+            title,
+            url,
+            manga_identifier: String::from(manga_identifier),
+        })
+    }
+
+    pub fn chapter_list(
+        manga_identifier: &str,
+        html_page: &str,
+    ) -> ParserResult<Vec<Box<dyn Chapter>>> {
+        let scraper_html_page = Html::parse_document(html_page);
+
+        let selector = chapter_list_selectors(manga_identifier);
+        if selector.is_none() {
+            return Ok(vec![]);
+        }
+        let selector = selector.unwrap();
+
+        scraper_html_page
+            .select(&selector)
+            .into_iter()
+            .enumerate()
+            .map(
+                |(i, el)| match chapter_from_element(manga_identifier, el, i) {
+                    Ok(chapter) => Ok(Box::new(chapter) as Box<dyn Chapter>),
+                    Err(err) => Err(err),
+                },
+            )
+            .collect::<ParserResult<Vec<Box<dyn Chapter>>>>()
+    }
+}
+
 #[derive(Default)]
 pub struct OpexMangaBuilder {
     identifier: Option<String>,
@@ -120,10 +260,10 @@ impl MangaInfo for OpexManga {
 impl MangaData for OpexManga {
     async fn chapter_list(&self) -> Result<Vec<Box<dyn Chapter>>> {
         let page = manga_client::manga_html_page(self).await?;
-        println!("{}", page);
-
-        Ok(vec![])
+        let chapters = manga_parser::chapter_list(self.identifier.as_str(), page.as_str())?;
+        Ok(chapters)
     }
+
     async fn get_chapter(&self, _chapter: usize) -> Result<Option<Box<dyn Chapter>>> {
         todo!()
     }

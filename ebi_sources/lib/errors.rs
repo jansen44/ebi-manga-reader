@@ -95,6 +95,7 @@ pub mod parser {
         ParsingError(String, SourceLocation),
         MissingElement(String),
         FailedTypeConversion(String),
+        InvalidParsingTarget(String),
     }
 
     impl<'a> From<cssparser::ParseError<'a, SelectorParseErrorKind<'a>>> for ParserError {
