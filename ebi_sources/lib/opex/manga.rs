@@ -16,8 +16,8 @@ mod manga_client {
     const REFERER_HEADER: &str = "https://onepieceex.net/";
     const ACCEPT_LANGUAGE_HEADER: &str = "pt-BR,pt;q=0.9,en-US;q=0.8,en;q=0.7,es;q=0.6,gl;q=0.5";
 
-    pub async fn manga_html_page(manga: &super::OpexManga) -> ClientResult<String> {
-        let url = format!("{}{}", OPEX_BASE_URL, manga.url.clone());
+    pub async fn manga_html_page(manga_url: &str) -> ClientResult<String> {
+        let url = format!("{}{}", OPEX_BASE_URL, manga_url);
 
         let mut headers = HeaderMap::new();
         headers.insert(header::ACCEPT, ACCEPT_HEADER.parse().unwrap());
@@ -259,7 +259,7 @@ impl MangaInfo for OpexManga {
 #[async_trait::async_trait]
 impl MangaData for OpexManga {
     async fn chapter_list(&self) -> Result<Vec<Box<dyn Chapter>>> {
-        let page = manga_client::manga_html_page(self).await?;
+        let page = manga_client::manga_html_page(self.url.as_str()).await?;
         let chapters = manga_parser::chapter_list(self.identifier.as_str(), page.as_str())?;
         Ok(chapters)
     }
