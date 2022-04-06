@@ -60,5 +60,21 @@ async fn main() -> Result<()> {
         println!("{}", c);
     }
 
+    println!("\n\n=== Manga Chapter ===\n");
+    let chapter_num = 1;
+    let chapter = manga.chapter(chapter_num).await?;
+    match chapter {
+        Some(c) => println!("{c}"),
+        None => println!("Chapter {chapter_num} not found!"),
+    }
+
+    let chapter_num = 1050;
+    let chapter = manga.chapter(chapter_num).await?;
+    match chapter {
+        Some(c) => println!("{c}"),
+        None => println!("Chapter {chapter_num} not found!"),
+    }
+    
+
     Ok(())
 }

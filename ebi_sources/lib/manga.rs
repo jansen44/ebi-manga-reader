@@ -14,7 +14,7 @@ pub trait MangaInfo {
 #[async_trait::async_trait]
 pub trait MangaData {
     async fn chapter_list(&self) -> Result<Vec<Box<dyn Chapter>>>;
-    async fn get_chapter(&self, chapter: usize) -> Result<Option<Box<dyn Chapter>>>;
+    async fn chapter(&self, chapter: usize) -> Result<Option<Box<dyn Chapter>>>;
 }
 
 pub trait Manga: MangaInfo + MangaData + std::fmt::Debug {}
