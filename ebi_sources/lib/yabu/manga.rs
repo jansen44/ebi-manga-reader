@@ -9,7 +9,7 @@ pub struct YabuMangaBuilder {
     identifier: Option<String>,
     title: Option<String>,
     cover: Option<String>,
-    url: Option<String>,
+    genre: Option<String>,
 }
 
 impl YabuMangaBuilder {
@@ -34,17 +34,21 @@ impl YabuMangaBuilder {
         self
     }
 
-    pub fn with_url(mut self, url: &str) -> Self {
-        self.url = Some(url.to_owned());
+    pub fn with_genre(mut self, genre: &str) -> Self {
+        self.genre = Some(genre.to_owned());
         self
     }
 
     pub fn build(&self) -> YabuManga {
+        let identifier = self.identifier.clone().unwrap_or_default();
+        let url =  format!("{}/manga/{}", YABU_BASE_URL, identifier.clone());
+
         YabuManga {
             identifier: self.identifier.clone().unwrap_or_default(),
             title: self.title.clone().unwrap_or_default(),
             cover: self.cover.clone().unwrap_or_default(),
-            url: self.url.clone().unwrap_or_default(),
+            url,
+            genre: self.genre.clone().unwrap_or_default(),
         }
     }
 }
@@ -55,6 +59,7 @@ pub struct YabuManga {
     pub title: String,
     pub cover: String,
     pub url: String,
+    pub genre: String,
 }
 
 impl MangaInfo for YabuManga {
@@ -71,11 +76,11 @@ impl MangaInfo for YabuManga {
     }
 
     fn url(&self) -> String {
-        format!("{}{}", YABU_BASE_URL, self.url)
+        self.url.clone()
     }
 
     fn genre(&self) -> Option<String> {
-        None
+        Some(self.genre.clone())
     }
 
     fn description(&self) -> Option<String> {

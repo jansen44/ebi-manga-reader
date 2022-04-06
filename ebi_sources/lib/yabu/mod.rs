@@ -2,6 +2,8 @@ use crate::manga::Manga;
 use crate::Result;
 use crate::source::{Source, SourceData, SourceInfo};
 
+mod client;
+
 pub mod manga;
 
 const YABU_SOURCE_IDENTIFIER: &str = "yabu";
@@ -47,7 +49,8 @@ impl SourceInfo for YabuSource {
 #[async_trait::async_trait]
 impl SourceData for YabuSource {
     async fn manga_list(&self) -> Result<Vec<Box<dyn Manga>>> {
-        todo!()
+        let manga_list = client::yabu_manga_list().await?;
+        Ok(manga_list)
     }
 
     async fn latest_manga(&self) -> Result<Vec<Box<dyn Manga>>> {
