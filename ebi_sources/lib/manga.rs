@@ -25,17 +25,7 @@ impl std::fmt::Display for dyn Manga {
         let title = self.title();
         let identifier = self.identifier();
         let url = self.url();
-        let cover = self.cover();
-        let genre = self.genre();
-        let description = self.description();
 
-        write!(f, "[{source}] ({identifier}) \"{title}\" - {url} - {cover}")?;
-        if genre.is_some() {
-            write!(f, " - {}", genre.unwrap())?;
-        }
-        if description.is_some() {
-            write!(f, " - {}", description.unwrap())?;
-        }
-        Ok(())
+        write!(f, "[{source}] ({identifier}) \"{title}\" - {url}")
     }
 }
