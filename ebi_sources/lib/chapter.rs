@@ -14,3 +14,16 @@ pub trait ChapterData {
 }
 
 pub trait Chapter: ChapterInfo + ChapterData + std::fmt::Debug {}
+
+impl std::fmt::Display for dyn Chapter {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        let chapter = self.chapter();
+        let title = self.title();
+        let url = self.url();
+        let manga_identifier = self.manga_identifier();
+        let source = self.source_identifier();
+
+        write!(f, "[{source}::{manga_identifier}] {chapter} - \"{title}\" - {url}")?;
+        Ok(())
+    }
+}

@@ -56,7 +56,9 @@ async fn main() -> Result<()> {
 
     println!("\n\n=== Manga Chapter List ===\n");
     let chapters = manga.chapter_list().await?;
-    println!("{:?}", chapters);
+    for c in chapters.iter() {
+        println!("{}", c);
+    }
 
     Ok(())
 }
