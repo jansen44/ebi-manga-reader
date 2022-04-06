@@ -103,36 +103,3 @@ impl SourceData for OpexSource {
 }
 
 impl Source for OpexSource {}
-
-// ==========================================================
-// pub struct Opex {
-//     client: client::OpexClient,
-//     parser: parser::Parser,
-// }
-
-// impl<'i> Opex {
-//     pub async fn chapters(&self, manga: &MManga) -> Result<'i, Vec<CChapter>> {
-//         let page = self.client.get_manga_web_page(manga).await?;
-//         let chapters = self.parser.get_chapter_list(manga, page.as_str())?;
-//         Ok(chapters)
-//     }
-
-//     pub async fn chapter(&self, manga: &MManga, id: usize) -> Result<'i, Option<CChapter>> {
-//         let chapters = self.chapters(manga).await?;
-//         let mut chapters = chapters.iter();
-
-//         let chapter = chapters.find(|chapter| chapter.id == id);
-//         if chapter.is_none() {
-//             return Ok(None);
-//         }
-
-//         let chapter = chapter.unwrap();
-//         Ok(Some(chapter.to_owned()))
-//     }
-
-//     pub async fn pages(&self, chapter: &CChapter) -> Result<'i, Vec<String>> {
-//         let page = self.client.get_chapter_web_page(chapter).await?;
-//         let pages = self.parser.get_page_list(page.as_str())?;
-//         Ok(pages)
-//     }
-// }

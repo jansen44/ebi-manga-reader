@@ -61,20 +61,24 @@ async fn main() -> Result<()> {
     }
 
     println!("\n\n=== Manga Chapter ===\n");
-    let chapter_num = 1;
-    let chapter = manga.chapter(chapter_num).await?;
-    match chapter {
-        Some(c) => println!("{c}"),
-        None => println!("Chapter {chapter_num} not found!"),
-    }
-
     let chapter_num = 1050;
     let chapter = manga.chapter(chapter_num).await?;
     match chapter {
         Some(c) => println!("{c}"),
         None => println!("Chapter {chapter_num} not found!"),
     }
-    
+
+    let chapter_num = 1044;
+    let chapter = manga.chapter(chapter_num).await?;
+    if chapter.is_none() {
+        println!("Chapter {chapter_num} not found!");
+    }
+    let chapter = chapter.unwrap();
+
+    let page_list = chapter.page_url_list().await?;
+    for page in page_list {
+        println!("{}", page);
+    }
 
     Ok(())
 }

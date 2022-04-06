@@ -2,7 +2,7 @@ use crate::chapter::Chapter;
 use crate::manga::{Manga, MangaData, MangaInfo};
 use crate::Result;
 
-use super::OPEX_SOURCE_IDENTIFIER;
+use super::{OPEX_SOURCE_IDENTIFIER, OPEX_BASE_URL};
 use super::client;
 
 mod manga_parser {
@@ -212,7 +212,7 @@ impl MangaInfo for OpexManga {
     }
 
     fn url(&self) -> String {
-        self.url.clone()
+        format!("{}{}", OPEX_BASE_URL, self.url)
     }
 
     fn genre(&self) -> Option<String> {

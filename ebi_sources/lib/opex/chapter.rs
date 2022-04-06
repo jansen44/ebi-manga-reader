@@ -1,7 +1,69 @@
 use crate::chapter::{Chapter, ChapterData, ChapterInfo};
 use crate::Result;
 
-use super::OPEX_SOURCE_IDENTIFIER;
+use super::client;
+use super::{OPEX_BASE_URL, OPEX_SOURCE_IDENTIFIER};
+
+mod chapter_parser {
+    use scraper::{Html, Selector};
+
+    use crate::errors::parser::{ParserError, ParserResult};
+    use crate::opex::OPEX_BASE_URL;
+
+    pub fn chapter_page_list(chapter_page_body: &str) -> ParserResult<Vec<String>> {
+        let page = Html::parse_document(chapter_page_body);
+
+        let script_selector = Selector::parse("#leitor-opex > strong > script").unwrap();
+        let script_elem = match page.select(&script_selector).next() {
+            Some(el) => el.inner_html(),
+            None => {
+                return Err(ParserError::MissingElement(String::from(
+                    "#leitor-opex > strong > script",
+                )))
+            }
+        };
+
+        let page_list_json = match script_elem.split("paginasLista = ").nth(1) {
+            Some(content) => content,
+            None => {
+                return Err(ParserError::Other(String::from(
+                    "\"paginasLista = \" identifier not found",
+                )))
+            }
+        };
+
+        let page_list_json = match page_list_json.split(";").next() {
+            Some(content) => content,
+            None => {
+                return Err(ParserError::Other(String::from(
+                    "\";\" identifier not found on split",
+                )))
+            }
+        };
+
+        let page_list_json = serde_json::from_str::<String>(page_list_json)?;
+        let page_list_json: serde_json::Value = serde_json::from_str(page_list_json.as_str())?;
+        let page_list_json = match page_list_json.as_object() {
+            Some(page_list) => page_list,
+            None => {
+                return Err(ParserError::Other(String::from(
+                    "could not get object from serde_json::Value",
+                )));
+            }
+        };
+
+        let mut page_list = page_list_json
+            .iter()
+            .map(|(key, value)| Ok((key.parse::<usize>()?, value.as_str().unwrap().to_owned())))
+            .collect::<ParserResult<Vec<(usize, String)>>>()?;
+        page_list.sort_by(|a, b| a.0.cmp(&b.0));
+
+        Ok(page_list
+            .iter()
+            .map(|(_, value)| format!("{}/{}", OPEX_BASE_URL, value))
+            .collect())
+    }
+}
 
 #[derive(Default)]
 pub struct OpexChapterBuilder {
@@ -66,7 +128,7 @@ impl ChapterInfo for OpexChapter {
     }
 
     fn url(&self) -> String {
-        self.url.clone()
+        format!("{}/{}", OPEX_BASE_URL, self.url)
     }
 
     fn manga_identifier(&self) -> String {
@@ -81,7 +143,9 @@ impl ChapterInfo for OpexChapter {
 #[async_trait::async_trait]
 impl ChapterData for OpexChapter {
     async fn page_url_list(&self) -> Result<Vec<String>> {
-        todo!()
+        let page = client::opex_html_page(self.url.as_str()).await?;
+        let pages = chapter_parser::chapter_page_list(page.as_str())?;
+        Ok(pages)
     }
 }
 
