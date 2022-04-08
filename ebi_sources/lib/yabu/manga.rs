@@ -48,7 +48,7 @@ impl YabuMangaBuilder {
             title: self.title.clone().unwrap_or_default(),
             cover: self.cover.clone().unwrap_or_default(),
             url,
-            genre: self.genre.clone().unwrap_or_default(),
+            genre: self.genre.clone(),
         }
     }
 }
@@ -59,7 +59,7 @@ pub struct YabuManga {
     pub title: String,
     pub cover: String,
     pub url: String,
-    pub genre: String,
+    pub genre: Option<String>,
 }
 
 impl MangaInfo for YabuManga {
@@ -80,7 +80,7 @@ impl MangaInfo for YabuManga {
     }
 
     fn genre(&self) -> Option<String> {
-        Some(self.genre.clone())
+        self.genre.clone()
     }
 
     fn description(&self) -> Option<String> {
