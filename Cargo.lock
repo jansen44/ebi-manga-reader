@@ -150,6 +150,7 @@ name = "ebi_archive"
 version = "0.1.0"
 dependencies = [
  "ebi_sources",
+ "reqwest",
  "tokio",
 ]
 

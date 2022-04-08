@@ -1,12 +1,12 @@
-use ebi_sources::opex::Opex;
-use ebi_sources::SourceErrors;
+use ebi_sources::opex::OpexSource;
 use ebi_archive::download_chapter;
+use ebi_sources::Result;
 
 #[tokio::main]
-async fn main() -> Result<(), SourceErrors> {
-    let opex = Opex::new()?;
+async fn main() -> Result<()> {
+    let opex = Box::new(OpexSource::default());
 
-    download_chapter(opex,"main",7).await?;
+    download_chapter(opex, "main", 7).await?;
 
     // // let mangas = opex.mangas().await?;
     // let manga = opex.manga("main").await?.unwrap();
