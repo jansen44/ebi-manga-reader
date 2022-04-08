@@ -203,8 +203,10 @@ impl SourceData for YabuSource {
             .collect())
     }
 
-    async fn get_manga(&self, _manga_identifier: &str) -> Result<Option<Box<dyn Manga>>> {
-        todo!()
+    async fn get_manga(&self, manga_identifier: &str) -> Result<Option<Box<dyn Manga>>> {
+        let full_list = self.manga_list().await?;
+        let manga = full_list.into_iter().find(|manga| manga.identifier() == manga_identifier);
+        Ok(manga)
     }
 }
 
