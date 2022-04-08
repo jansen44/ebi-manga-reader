@@ -45,7 +45,7 @@ async fn main() -> Result<()> {
     }
 
     println!("\n\n=== Search Manga ===\n");
-    let manga = sources[0].search_manga("").await?;
+    let manga = sources[1].search_manga("vin").await?;
     for m in manga {
         println!("{}", m);
     }

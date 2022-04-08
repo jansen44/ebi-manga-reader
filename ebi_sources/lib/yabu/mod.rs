@@ -106,7 +106,10 @@ mod source_parser {
         manga_list
     }
 
-    fn manga_list_from_carousel_at(position: usize, html: Html) -> ParserResult<Vec<Box<dyn Manga>>> {
+    fn manga_list_from_carousel_at(
+        position: usize,
+        html: Html,
+    ) -> ParserResult<Vec<Box<dyn Manga>>> {
         let selector = Selector::parse("#main .carousel").unwrap();
 
         let carousel = html.select(&selector).nth(position);
@@ -190,8 +193,14 @@ impl SourceData for YabuSource {
         self.popular_manga().await
     }
 
-    async fn search_manga(&self, _manga_title: &str) -> Result<Vec<Box<dyn Manga>>> {
-        todo!()
+    async fn search_manga(&self, manga_title: &str) -> Result<Vec<Box<dyn Manga>>> {
+        let full_list = self.manga_list().await?;
+        let reg = regex::Regex::new(manga_title.to_uppercase().as_str()).unwrap();
+
+        Ok(full_list
+            .into_iter()
+            .filter(|manga| reg.is_match(manga.title().to_uppercase().as_str()))
+            .collect())
     }
 
     async fn get_manga(&self, _manga_identifier: &str) -> Result<Option<Box<dyn Manga>>> {
