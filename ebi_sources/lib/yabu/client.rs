@@ -50,6 +50,20 @@ pub async fn yabu_homepage_html() -> ClientResult<String> {
     Ok(body)
 }
 
+pub async fn yabu_html(url: &str) -> ClientResult<String> {
+    let mut headers = HeaderMap::new();
+    headers.insert(
+        header::ACCEPT_LANGUAGE,
+        HTML_ACCEPT_LANGUAGE_HEADER.parse().unwrap(),
+    );
+    headers.insert(header::ACCEPT, HTML_ACCEPT_HEADER.parse().unwrap());
+
+    let client = Client::builder().default_headers(headers).build().unwrap();
+    let body = client.get(url).send().await?.text().await?;
+
+    Ok(body)
+}
+
 #[derive(Debug, serde::Deserialize)]
 struct MangaResponse {
     #[serde(rename = "hash")]

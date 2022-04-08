@@ -5,6 +5,7 @@ use crate::Result;
 mod client;
 
 pub mod manga;
+pub mod chapter;
 
 const YABU_SOURCE_IDENTIFIER: &str = "yabu";
 const YABU_BASE_URL: &str = "https://mangayabu.top";
@@ -21,7 +22,7 @@ mod source_parser {
     const POPULAR_MANGA_CAROUSEL_POSITION: usize = 1;
 
     fn manga_card_cover(el: ElementRef) -> ParserResult<String> {
-        let cover_selector = Selector::parse(".image img").unwrap();
+        let cover_selector = Selector::parse(".image img")?;
         let img = match el.select(&cover_selector).next() {
             Some(img) => img,
             None => {
@@ -43,7 +44,7 @@ mod source_parser {
     }
 
     fn manga_card_title(el: ElementRef) -> ParserResult<String> {
-        let link_selector = Selector::parse(".info-bottom a").unwrap();
+        let link_selector = Selector::parse(".info-bottom a")?;
         match el.select(&link_selector).next() {
             Some(anchor_el) => Ok(anchor_el.inner_html()),
             None => {
@@ -55,7 +56,7 @@ mod source_parser {
     }
 
     fn manga_card_identifier(el: ElementRef) -> ParserResult<String> {
-        let link_selector = Selector::parse(".info-bottom a").unwrap();
+        let link_selector = Selector::parse(".info-bottom a")?;
         let href = match el.select(&link_selector).next() {
             Some(href) => href.value().attr("href"),
             None => {
@@ -93,7 +94,7 @@ mod source_parser {
     }
 
     fn manga_list_from_carousel(element: ElementRef) -> ParserResult<Vec<Box<dyn Manga>>> {
-        let manga_card_selector = Selector::parse(".manga-card").unwrap();
+        let manga_card_selector = Selector::parse(".manga-card")?;
         let manga_card_iter = element.select(&manga_card_selector);
 
         let manga_list = manga_card_iter
@@ -110,7 +111,7 @@ mod source_parser {
         position: usize,
         html: Html,
     ) -> ParserResult<Vec<Box<dyn Manga>>> {
-        let selector = Selector::parse("#main .carousel").unwrap();
+        let selector = Selector::parse("#main .carousel")?;
 
         let carousel = html.select(&selector).nth(position);
 

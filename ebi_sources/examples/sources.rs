@@ -51,7 +51,7 @@ async fn main() -> Result<()> {
     }
 
     println!("\n\n=== Get Manga ===\n");
-    let manga = sources[0].get_manga("main").await?.unwrap();
+    let manga = sources[1].get_manga("vinland-saga").await?.unwrap();
     println!("{}", manga);
 
     println!("\n\n=== Manga Chapter List ===\n");
