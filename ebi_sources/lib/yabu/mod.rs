@@ -18,6 +18,7 @@ mod source_parser {
     use super::manga::{YabuManga, YabuMangaBuilder};
 
     const LATEST_MANGA_CAROUSEL_POSITION: usize = 0;
+    const POPULAR_MANGA_CAROUSEL_POSITION: usize = 1;
 
     fn manga_card_cover(el: ElementRef) -> ParserResult<String> {
         let cover_selector = Selector::parse(".image img").unwrap();
@@ -105,11 +106,10 @@ mod source_parser {
         manga_list
     }
 
-    pub fn latest_manga_list(yabu_homepage_html: &str) -> ParserResult<Vec<Box<dyn Manga>>> {
-        let html = Html::parse_document(yabu_homepage_html);
+    fn manga_list_from_carousel_at(position: usize, html: Html) -> ParserResult<Vec<Box<dyn Manga>>> {
         let selector = Selector::parse("#main .carousel").unwrap();
 
-        let carousel = html.select(&selector).nth(LATEST_MANGA_CAROUSEL_POSITION);
+        let carousel = html.select(&selector).nth(position);
 
         match carousel {
             Some(carousel) => manga_list_from_carousel(carousel),
@@ -117,6 +117,16 @@ mod source_parser {
                 "could not find \"latest_manga\" carousel",
             ))),
         }
+    }
+
+    pub fn latest_manga_list(yabu_homepage_html: &str) -> ParserResult<Vec<Box<dyn Manga>>> {
+        let html = Html::parse_document(yabu_homepage_html);
+        manga_list_from_carousel_at(LATEST_MANGA_CAROUSEL_POSITION, html)
+    }
+
+    pub fn popular_manga_list(yabu_homepage_html: &str) -> ParserResult<Vec<Box<dyn Manga>>> {
+        let html = Html::parse_document(yabu_homepage_html);
+        manga_list_from_carousel_at(POPULAR_MANGA_CAROUSEL_POSITION, html)
     }
 }
 
@@ -171,11 +181,13 @@ impl SourceData for YabuSource {
     }
 
     async fn popular_manga(&self) -> Result<Vec<Box<dyn Manga>>> {
-        todo!()
+        let html_page = client::yabu_homepage_html().await?;
+        let manga_list = source_parser::popular_manga_list(html_page.as_str())?;
+        Ok(manga_list)
     }
 
     async fn hot_manga(&self) -> Result<Vec<Box<dyn Manga>>> {
-        todo!()
+        self.popular_manga().await
     }
 
     async fn search_manga(&self, _manga_title: &str) -> Result<Vec<Box<dyn Manga>>> {
