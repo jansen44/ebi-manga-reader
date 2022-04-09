@@ -154,8 +154,13 @@ impl MangaData for YabuManga {
         Ok(chapters)
     }
 
-    async fn chapter(&self, _chapter: usize) -> Result<Option<Box<dyn Chapter>>> {
-        todo!()
+    async fn chapter(&self, chapter: usize) -> Result<Option<Box<dyn Chapter>>> {
+        let mut chapter_list = self.chapter_list().await?;
+        if chapter > chapter_list.len() {
+            return Ok(None);
+        }
+        let chapter = chapter_list.swap_remove(chapter);
+        Ok(Some(chapter))
     }
 }
 
