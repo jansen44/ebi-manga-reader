@@ -34,6 +34,29 @@ pub async fn yabu_manga_list() -> ClientResult<Vec<Box<dyn Manga>>> {
     Ok(body.into())
 }
 
+pub async fn yabu_chapter_page_list(url: &str) -> ClientResult<Vec<String>> {
+    let mut headers = HeaderMap::new();
+    headers.insert(header::ACCEPT, API_ACCEPT_HEADER.parse().unwrap());
+    headers.insert(header::REFERER, API_REFERER_HEADER.parse().unwrap());
+    headers.insert(
+        header::ACCEPT_LANGUAGE,
+        API_ACCEPT_LANGUAGE_HEADER.parse().unwrap(),
+    );
+
+    let client = Client::builder().default_headers(headers).build().unwrap();
+    let body: serde_json::Value = client.get(url).send().await?.json().await?;
+    let chapter_list: Vec<String> = body
+        .get("Miko")
+        .unwrap()
+        .as_array()
+        .unwrap()
+        .into_iter()
+        .map(|value| value.as_str().unwrap().to_owned())
+        .collect();
+
+    Ok(chapter_list)
+}
+
 pub async fn yabu_homepage_html() -> ClientResult<String> {
     let url = YABU_BASE_URL.to_owned();
 

@@ -1,5 +1,8 @@
 use crate::chapter::{Chapter, ChapterData, ChapterInfo};
+use crate::errors::SourceError;
 use crate::Result;
+
+use super::client;
 
 use super::{YABU_BASE_URL, YABU_SOURCE_IDENTIFIER};
 
@@ -46,6 +49,7 @@ impl YabuChapterBuilder {
             chapter: self.chapter.unwrap_or_default(),
             title: self.title.clone().unwrap_or_default(),
             manga_identifier: self.manga_identifier.clone().unwrap_or_default(),
+            yabu_id: self.yabu_id.unwrap_or_default(),
         }
     }
 }
@@ -56,6 +60,7 @@ pub struct YabuChapter {
     pub title: String,
     pub url: String,
     pub manga_identifier: String,
+    pub yabu_id: usize,
 }
 
 impl ChapterInfo for YabuChapter {
@@ -83,7 +88,32 @@ impl ChapterInfo for YabuChapter {
 #[async_trait::async_trait]
 impl ChapterData for YabuChapter {
     async fn page_url_list(&self) -> Result<Vec<String>> {
-        todo!()
+        let page = client::yabu_html(self.url.as_str()).await?;
+        let hatsuna = page
+            .split("var hatsuna = ")
+            .nth(1)
+            .unwrap()
+            .split(";")
+            .nth(0)
+            .unwrap();
+
+        let hatsuna: usize = match hatsuna.parse() {
+            Ok(hatsuna) => hatsuna,
+            Err(_) => {
+                return Err(SourceError::InvalidSourceData(String::from(
+                    "Invalid Hatsuna for manga chapter",
+                )))
+            }
+        };
+
+        let api_url = format!(
+            "{}/chapter.php?id={}&hatsuna={}&cachebuster=0",
+            YABU_BASE_URL, self.yabu_id, hatsuna
+        );
+
+        let chapter_list = client::yabu_chapter_page_list(api_url.as_str()).await?;
+
+        Ok(chapter_list)
     }
 }
 
