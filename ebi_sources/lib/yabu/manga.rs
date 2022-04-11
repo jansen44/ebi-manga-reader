@@ -31,6 +31,7 @@ mod manga_parser {
 
         let chapters: Vec<Box<dyn Chapter>> = all_posts_json
             .iter()
+            .rev()
             .enumerate()
             .map(|(idx, chapter)| {
                 let chapter = chapter.as_object().unwrap();
