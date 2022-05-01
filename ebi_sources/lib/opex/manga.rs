@@ -141,7 +141,7 @@ mod manga_parser {
                     Err(err) => Err(err),
                 },
             )
-            .collect::<ParserResult<Vec<Box<dyn Chapter>>>>()
+            .collect()
     }
 }
 

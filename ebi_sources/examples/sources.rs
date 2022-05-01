@@ -45,13 +45,13 @@ async fn main() -> Result<()> {
     }
 
     println!("\n\n=== Search Manga ===\n");
-    let manga = sources[0].search_manga("").await?;
+    let manga = sources[1].search_manga("vin").await?;
     for m in manga {
         println!("{}", m);
     }
 
     println!("\n\n=== Get Manga ===\n");
-    let manga = sources[0].get_manga("main").await?.unwrap();
+    let manga = sources[1].get_manga("vinland-saga").await?.unwrap();
     println!("{}", manga);
 
     println!("\n\n=== Manga Chapter List ===\n");
@@ -61,17 +61,18 @@ async fn main() -> Result<()> {
     }
 
     println!("\n\n=== Manga Chapter ===\n");
-    let chapter_num = 1050;
+    let chapter_num = 300;
     let chapter = manga.chapter(chapter_num).await?;
     match chapter {
         Some(c) => println!("{c}"),
         None => println!("Chapter {chapter_num} not found!"),
     }
 
-    let chapter_num = 1044;
+    let chapter_num = 120;
     let chapter = manga.chapter(chapter_num).await?;
-    if chapter.is_none() {
-        println!("Chapter {chapter_num} not found!");
+    match chapter {
+        Some(ref c) => println!("{c}"),
+        None => println!("Chapter {chapter_num} not found!"),
     }
     let chapter = chapter.unwrap();
 
