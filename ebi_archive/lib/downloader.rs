@@ -48,15 +48,12 @@ pub async fn download_chapter(
         let cloned_page = page.clone();
         tasks.push(tokio::spawn(async move {
             match download_page(page, destination).await {
-                Err(err) => {
-                    DownloadError::GenericError(format!(
-                        "ERROR downloading {}: {}",
-                        cloned_page, err
-                    ));
-                }
-                _ => {}
+                Err(err) => Err(DownloadError::GenericError(format!(
+                    "ERROR downloading {}: {}",
+                    cloned_page, err
+                ))),
+                _ => Ok(()),
             }
-            Ok(())
         }));
     }
 
