@@ -1,6 +1,6 @@
+use ebi_archive::downloader::download_chapter;
+use ebi_archive::Result;
 use ebi_sources::opex::OpexSource;
-use ebi_archive::download_chapter;
-use ebi_sources::Result;
 
 #[tokio::main]
 async fn main() -> Result<()> {
