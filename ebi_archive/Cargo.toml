@@ -17,3 +17,4 @@ path = "lib/lib.rs"
 reqwest = { version = "0.11", features = ["default-tls", "json"] }
 tokio = { version = "1.17.0", features = ["rt-multi-thread", "macros"] }
 ebi_sources = { path = "../ebi_sources" }
+futures = "0.3.21"
