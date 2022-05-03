@@ -14,17 +14,12 @@ pub async fn download_chapter(
     manga_identifier: &str,
     chapter_number: usize,
 ) -> Result<()> {
-    let created_directory_result = fs::create_dir_all(format!(
+    let _ = fs::create_dir_all(format!(
         "{source_name}/{identifier}/{chapter}",
-        source_name = "opex",
+        source_name = source.identifier(),
         identifier = manga_identifier,
         chapter = chapter_number
-    ));
-
-    let _created_directory = match created_directory_result {
-        Ok(directory) => directory,
-        Err(error) => panic!("Problem creating chapter directory: {}", error),
-    };
+    ))?;
 
     let manga = source.get_manga(manga_identifier).await?.unwrap();
     let chapter = manga.chapter(chapter_number).await?.unwrap();
@@ -45,12 +40,12 @@ pub async fn download_chapter(
             chapter = chapter_number,
             page = file_name
         );
-        let cloned_page = page.clone();
         tasks.push(tokio::spawn(async move {
-            match download_page(page, destination).await {
+            let downloaded = download_page(page.as_str(), &destination).await;
+            match downloaded {
                 Err(err) => Err(DownloadError::GenericError(format!(
                     "ERROR downloading {}: {}",
-                    cloned_page, err
+                    page, err
                 ))),
                 _ => Ok(()),
             }
@@ -62,10 +57,10 @@ pub async fn download_chapter(
     Ok(())
 }
 
-async fn download_page(page: String, destination: String) -> Result<(), DownloadError> {
-    let resp = reqwest::get(page).await?;
+async fn download_page(page: &str, destination: &str) -> Result<(), DownloadError> {
+    let resp = reqwest::get(page.to_owned()).await?;
 
-    let mut out = File::create(destination).expect("failed to create file");
+    let mut out = File::create(destination.to_owned()).expect("failed to create file");
     let mut content = Cursor::new(resp.bytes().await?);
     io::copy(&mut content, &mut out).expect("failed to copy content");
     Ok(())

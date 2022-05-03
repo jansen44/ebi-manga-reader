@@ -14,7 +14,7 @@ pub enum ArchiveError {
 
 impl Display for ArchiveError {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        match *self {
+        match self {
             ArchiveError::RequestError(ref e) | ArchiveError::RequestBodyError(ref e) => {
                 write!(f, "download_error: {e}")
             }
@@ -26,7 +26,7 @@ impl Display for ArchiveError {
 
 impl error::Error for ArchiveError {
     fn source(&self) -> Option<&(dyn error::Error + 'static)> {
-        match *self {
+        match self {
             ArchiveError::RequestError(ref e) | ArchiveError::RequestBodyError(ref e) => e.source(),
             ArchiveError::DownloadError(ref e) => e.source(),
             ArchiveError::SourceError(ref e) => e.source(),
@@ -64,7 +64,7 @@ pub mod download {
 
     impl Display for DownloadError {
         fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-            match *self {
+            match self {
                 DownloadError::GenericError(ref e) => write!(f, "{e}"),
                 DownloadError::RequestError(ref e) | DownloadError::RequestBodyError(ref e) => {
                     write!(f, "{e}")
@@ -75,7 +75,7 @@ pub mod download {
 
     impl error::Error for DownloadError {
         fn source(&self) -> Option<&(dyn error::Error + 'static)> {
-            match *self {
+            match self {
                 DownloadError::GenericError(ref e) => Err(e).ok(),
                 DownloadError::RequestError(ref e) | DownloadError::RequestBodyError(ref e) => {
                     e.source()
