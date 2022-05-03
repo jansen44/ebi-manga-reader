@@ -14,15 +14,10 @@ pub async fn download_chapter(
     manga_identifier: &str,
     chapter_number: usize,
 ) -> Result<()> {
-    let _ = fs::create_dir_all(format!(
-        "{source_name}/{identifier}/{chapter}",
-        source_name = source.identifier(),
-        identifier = manga_identifier,
-        chapter = chapter_number
-    ))?;
+    create_directories(&source.identifier(), manga_identifier, chapter_number)?;
 
     let manga = source.get_manga(manga_identifier).await?.unwrap();
-    let chapter = manga.chapter(chapter_number).await?.unwrap();
+    let chapter = manga.chapter(chapter_number.to_owned()).await?.unwrap();
     let pages = chapter.page_url_list().await?;
 
     println!("Download Chapter: {:?}", chapter);
@@ -55,6 +50,19 @@ pub async fn download_chapter(
     join_all(tasks).await;
 
     Ok(())
+}
+
+fn create_directories(
+    source_name: &str,
+    manga_identifier: &str,
+    chapter_number: usize,
+) -> std::io::Result<()> {
+    fs::create_dir_all(format!(
+        "{source_name}/{identifier}/{chapter}",
+        source_name = source_name,
+        identifier = manga_identifier,
+        chapter = chapter_number
+    ))
 }
 
 async fn download_page(page: &str, destination: &str) -> Result<(), DownloadError> {

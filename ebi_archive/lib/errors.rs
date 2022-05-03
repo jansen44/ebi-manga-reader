@@ -8,6 +8,8 @@ pub enum ArchiveError {
     SourceError(ebi_sources::errors::SourceError),
     DownloadError(download::DownloadError),
 
+    IOError(std::io::Error),
+
     RequestError(reqwest::Error),
     RequestBodyError(reqwest::Error),
 }
@@ -15,6 +17,7 @@ pub enum ArchiveError {
 impl Display for ArchiveError {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {
+            ArchiveError::IOError(ref e) => write!(f, "io_error: {e}"),
             ArchiveError::RequestError(ref e) | ArchiveError::RequestBodyError(ref e) => {
                 write!(f, "download_error: {e}")
             }
@@ -30,6 +33,7 @@ impl error::Error for ArchiveError {
             ArchiveError::RequestError(ref e) | ArchiveError::RequestBodyError(ref e) => e.source(),
             ArchiveError::DownloadError(ref e) => e.source(),
             ArchiveError::SourceError(ref e) => e.source(),
+            ArchiveError::IOError(ref e) => e.source(),
         }
     }
 }
@@ -46,6 +50,12 @@ impl From<reqwest::Error> for ArchiveError {
             return ArchiveError::RequestBodyError(err);
         }
         ArchiveError::RequestError(err)
+    }
+}
+
+impl From<std::io::Error> for ArchiveError {
+    fn from(err: std::io::Error) -> Self {
+        ArchiveError::IOError(err)
     }
 }
 

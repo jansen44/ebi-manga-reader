@@ -1,13 +1,22 @@
+use std::env;
+
 use ebi_archive::downloader::download_chapter;
 use ebi_archive::Result;
 use ebi_sources::opex::OpexSource;
 
 #[tokio::main]
 async fn main() -> Result<()> {
-    let opex = Box::new(OpexSource::default());
+    let args: Vec<String> = env::args().collect();
+    println!("{:?}", args);
 
-    download_chapter(opex, "main", 7).await?;
+    if args.len() > 1 {
+        let chapter = &args[1].parse::<usize>().unwrap();
 
+        let opex = Box::new(OpexSource::default());
 
-    Ok(())
+        download_chapter(opex, "main", chapter.to_owned()).await?;
+        Ok(())
+    } else {
+        panic!("chapter argument required")
+    }
 }
