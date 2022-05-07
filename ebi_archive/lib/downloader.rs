@@ -9,12 +9,14 @@ use std::io;
 use std::io::Cursor;
 use tokio::task::JoinHandle;
 
+const DEFAULT_DIR: &str = "ebi/manga";
+
 pub async fn download_chapter(
     source: Box<dyn Source>,
     manga_identifier: &str,
     chapter_number: usize,
 ) -> Result<()> {
-    create_directories(&source.identifier(), manga_identifier, chapter_number)?;
+    let base_path = create_directories(&source.identifier(), manga_identifier, chapter_number)?;
 
     let manga = source.get_manga(manga_identifier).await?.unwrap();
     let chapter = manga.chapter(chapter_number.to_owned()).await?.unwrap();
@@ -29,10 +31,7 @@ pub async fn download_chapter(
         let file_name = url_parts.last().unwrap();
         println!("{:?}", format!("{}::::{}", page, file_name));
         let destination = format!(
-            "{source_name}/{identifier}/{chapter}/{page}",
-            source_name = source.identifier(),
-            identifier = manga_identifier,
-            chapter = chapter_number,
+            "{base_path}/{page}",
             page = file_name
         );
         tasks.push(tokio::spawn(async move {
@@ -56,13 +55,16 @@ fn create_directories(
     source_name: &str,
     manga_identifier: &str,
     chapter_number: usize,
-) -> std::io::Result<()> {
-    fs::create_dir_all(format!(
-        "{source_name}/{identifier}/{chapter}",
+) -> std::io::Result<String> {
+    let home = std::env::var("HOME").unwrap(); // TODO: handle this error and "Windows" later
+    let base_path = format!(
+        "{home}/{DEFAULT_DIR}/{source_name}/{identifier}/{chapter}",
         source_name = source_name,
         identifier = manga_identifier,
         chapter = chapter_number
-    ))
+    );
+    fs::create_dir_all(&base_path)?;
+    Ok(base_path)
 }
 
 async fn download_page(page: &str, destination: &str) -> Result<(), DownloadError> {
