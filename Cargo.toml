@@ -1,5 +1,6 @@
 [workspace]
 members = [
     "ebi",
-    "ebi_sources"
+    "ebi_sources",
+    "ebi_archive"
 ]
