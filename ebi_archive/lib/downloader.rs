@@ -128,7 +128,7 @@ pub async fn download_chapter(
     println!(" Done!");
 
     print!("Loading necessary chapter info...");
-    let chapter = manga.chapter(chapter_number.to_owned()).await?.unwrap();
+    let chapter = manga.chapter(chapter_number).await?.unwrap();
     let pages = chapter.page_url_list().await?;
     println!(" Done!");
 

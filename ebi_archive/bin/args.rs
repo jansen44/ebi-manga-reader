@@ -24,15 +24,15 @@ pub fn get_args() -> ArgMatches {
                     .required(true)
                     .takes_value(true),
             )
-            .arg(
-                Arg::new("title")
-                    .short('t')
-                    .long("title")
-                    .display_order(1)
-                    .help("Manga title that will be used to look after it before downloading. Optional if \"identifier\" present.")
-                    .max_occurrences(1)
-                    .takes_value(true),
-            )
+            // .arg(
+            //     Arg::new("title")
+            //         .short('t')
+            //         .long("title")
+            //         .display_order(1)
+            //         .help("Manga title that will be used to look after it before downloading. Optional if \"identifier\" present.")
+            //         .max_occurrences(1)
+            //         .takes_value(true),
+            // )
             .arg(
                 Arg::new("identifier")
                     .short('i')
@@ -52,7 +52,7 @@ pub fn get_args() -> ArgMatches {
                     .required(true)
                     .takes_value(true),
             )
-            .group(ArgGroup::new("manga").args(&["title", "identifier"]).required(true)),
+            .group(ArgGroup::new("manga").args(&["identifier"]).required(true)),
     )
     .get_matches()
 }
