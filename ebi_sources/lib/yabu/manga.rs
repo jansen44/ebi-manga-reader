@@ -159,7 +159,7 @@ impl MangaData for YabuManga {
         let mut chapter_list = self.chapter_list().await?;
 
         let chapter = match chapter {
-            chapter if chapter > chapter_list.len() => return Ok(None),
+            chapter if chapter > chapter_list.len() => chapter_list.len(),
             chapter if chapter == 0 => 1,
             _ => chapter,
         };

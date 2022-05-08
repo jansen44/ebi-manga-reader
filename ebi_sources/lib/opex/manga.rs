@@ -238,7 +238,11 @@ impl MangaData for OpexManga {
 
     async fn chapter(&self, chapter: usize) -> Result<Option<Box<dyn Chapter>>> {
         let chapters = self.chapter_list().await?;
-        let chapter = if chapter == 0 { 1 } else { chapter };
+        let chapter = match chapter {
+            chapter if chapter > chapters.len() => chapters.len(),
+            chapter if chapter == 0 => 1,
+            _ => chapter,
+        };
         let chapter = chapters.into_iter().find(|c| c.chapter() == chapter);
         Ok(chapter)
     }
