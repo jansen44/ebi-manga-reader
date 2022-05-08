@@ -5,6 +5,7 @@ pub type Result<T> = std::result::Result<T, SourceError>;
 
 #[derive(Debug)]
 pub enum SourceError {
+    InvalidSourceIdentifier,
     InvalidSourceData(String),
     ClientError(client::ClientError),
     ParserError(parser::ParserError),
@@ -13,6 +14,7 @@ pub enum SourceError {
 impl Display for SourceError {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match *self {
+            SourceError::InvalidSourceIdentifier => write!(f, "error: Invalid source identifier"),
             SourceError::InvalidSourceData(ref e) => write!(f, "error: Invalid source data: {e}"),
             SourceError::ClientError(ref e) => write!(f, "client_error: {e}"),
             SourceError::ParserError(ref e) => write!(f, "parsing_error: {:?}", e),
