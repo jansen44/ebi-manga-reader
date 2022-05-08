@@ -112,7 +112,6 @@ pub async fn download_all_chapters(
     while chapters.len() > 0 {
         let mut tasks: Vec<JoinHandle<Result<String, crate::errors::ArchiveError>>> =
             Vec::with_capacity(CHAPTER_BATCH_SIZE); // maybe thread better??
-        let mut downloaded: String = String::new();
 
         for i in 0..CHAPTER_BATCH_SIZE {
             if i >= chapters.len() {
@@ -120,7 +119,6 @@ pub async fn download_all_chapters(
             }
 
             let chapter = chapters.swap_remove(i);
-            downloaded = format!("{},{}", chapter.chapter(), downloaded);
 
             let destination = match destination {
                 Some(ref s) => Some(s.clone()),
@@ -149,7 +147,7 @@ pub async fn download_all_chapters(
                 Err(err) => println!("error: Join error: {}", err),
             }
         }
-        println!("Batch with chapters [{downloaded}] done.");
+        println!();
     }
 
     Ok(())
