@@ -1,3 +1,5 @@
+// TODO: make stdout output be optional
+
 use crate::errors::download::DownloadError;
 use crate::Result;
 use ebi_sources::get_available_sources;
@@ -44,6 +46,72 @@ async fn download_page(page_url: &str, destination: &str) -> Result<(), Download
     Ok(())
 }
 
+fn download_page_job(
+    page: String,
+    destination: String,
+    file_name: String,
+) -> JoinHandle<Result<(), DownloadError>> {
+    tokio::spawn(async move {
+        let downloaded = download_page(page.as_str(), destination.as_str()).await;
+        match downloaded {
+            Err(err) => Err(DownloadError::GenericError(format!(
+                "ERROR downloading {}: {}",
+                page, err
+            ))),
+            _ => {
+                println!("Downloaded: {file_name}");
+                Ok(())
+            }
+        }
+    })
+}
+
+async fn download_single_chapter(
+    source_identifier: &str,
+    manga_identifier: &str,
+    manga_title: &str,
+    chapter_number: usize,
+    chapter_title: &str,
+    pages: Vec<String>,
+    destination: Option<String>,
+) -> Result<()> {
+    print!("Creating necessary directories...");
+    let target_dir = create_directories(
+        source_identifier,
+        manga_identifier,
+        chapter_number,
+        destination,
+    )?;
+    println!(" Done!");
+
+    let mut tasks: Vec<JoinHandle<Result<(), DownloadError>>> = vec![];
+
+    println!(
+        "== Starting download of \"{}\" chapter {} - \"{}\"",
+        manga_title, chapter_number, chapter_title,
+    );
+    for page in pages {
+        // TODO: more consistent filename generation (maybe just index?)
+        let url_parts = page.split("/").collect::<Vec<&str>>();
+        let file_name = (*url_parts.last().unwrap()).to_owned();
+
+        let destination = format!("{target_dir}/{page}", page = file_name.clone());
+
+        tasks.push(download_page_job(
+            page.clone(),
+            destination.clone(),
+            file_name.clone(),
+        ));
+    }
+
+    join_all(tasks).await;
+    println!("== Everything done! ==");
+    println!("You can find it here: {target_dir}");
+    println!("Have a good reading!");
+
+    Ok(())
+}
+
 pub async fn download_chapter(
     source: &str,
     manga_identifier: &str,
@@ -64,49 +132,14 @@ pub async fn download_chapter(
     let pages = chapter.page_url_list().await?;
     println!(" Done!");
 
-    print!("Creating necessary directories...");
-    let target_dir = create_directories(
-        &source.identifier(),
-        manga_identifier,
-        chapter_number,
+    download_single_chapter(
+        source.identifier().as_str(),
+        manga.identifier().as_str(),
+        manga.title().as_str(),
+        chapter.chapter(),
+        chapter.title().as_str(),
+        pages,
         destination,
-    )?;
-    println!(" Done!");
-
-    let mut tasks: Vec<JoinHandle<Result<(), DownloadError>>> = vec![];
-
-    println!(
-        "== Starting download of \"{}\" chapter {} - \"{}\"",
-        manga.title(),
-        chapter_number,
-        chapter.title()
-    );
-    for page in pages {
-        // TODO: more consistent filename generation (maybe just index?)
-        let url_parts = page.split("/").collect::<Vec<&str>>();
-        let file_name = (*url_parts.last().unwrap()).to_owned();
-
-        let destination = format!("{target_dir}/{page}", page = file_name.clone());
-
-        tasks.push(tokio::spawn(async move {
-            let downloaded = download_page(page.as_str(), &destination).await;
-            match downloaded {
-                Err(err) => Err(DownloadError::GenericError(format!(
-                    "ERROR downloading {}: {}",
-                    page, err
-                ))),
-                _ => {
-                    println!("Downloaded: {file_name}");
-                    Ok(())
-                }
-            }
-        }));
-    }
-
-    join_all(tasks).await;
-    println!("== Everything done! ==");
-    println!("You can find it here: {target_dir}");
-    println!("Have a good reading!");
-
-    Ok(())
+    )
+    .await
 }
