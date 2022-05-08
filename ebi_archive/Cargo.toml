@@ -4,7 +4,7 @@ version = "0.1.0"
 edition = "2021"
 
 [[bin]]
-name = "ebi_archiver"
+name = "ebi-archiver"
 path = "bin/main.rs"
 
 [lib]

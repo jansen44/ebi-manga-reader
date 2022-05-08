@@ -1,4 +1,4 @@
-use ebi_archive::downloader::download_chapter;
+use ebi_archive::downloader::{download_chapter, download_all_chapters};
 use ebi_archive::errors::{ArchiveError, Result};
 use ebi_sources::errors::SourceError;
 use ebi_sources::get_available_sources;
@@ -20,22 +20,30 @@ fn handle_sources() {
 async fn handle_down(arg_matches: &clap::ArgMatches) -> Result<()> {
     let source = arg_matches.value_of("source").unwrap();
     let manga_identifier = arg_matches.value_of("identifier").unwrap();
-    let chapter: usize = arg_matches.value_of("chapter").unwrap().parse().unwrap();
-
+    let target_dir = match arg_matches.value_of("target_dir") {
+        Some(dir) => Some(dir.to_owned()),
+        None => None,
+    };
+    
     let sources = get_available_sources();
     let source = match sources.get(source) {
         Some(source) => source,
         None => return Err(ArchiveError::from(SourceError::InvalidSourceIdentifier)),
     };
+    
+    if arg_matches.is_present("all") {
+        return download_all_chapters(source.identifier().as_str(), manga_identifier, target_dir).await;
+    }
+    
+    let chapter: usize = arg_matches.value_of("chapter").unwrap().parse().unwrap();
 
     download_chapter(
         source.identifier().as_str(),
         manga_identifier,
         chapter,
-        None,
+        target_dir,
     )
-    .await?;
-    Ok(())
+    .await
 }
 
 #[tokio::main]

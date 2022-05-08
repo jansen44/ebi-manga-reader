@@ -13,7 +13,7 @@ pub trait ChapterData {
     async fn page_url_list(&self) -> Result<Vec<String>>;
 }
 
-pub trait Chapter: ChapterInfo + ChapterData + std::fmt::Debug {}
+pub trait Chapter: ChapterInfo + ChapterData + std::fmt::Debug + std::marker::Send + std::marker::Sync {}
 
 impl std::fmt::Display for dyn Chapter {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {

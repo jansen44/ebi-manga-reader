@@ -13,6 +13,7 @@ pub fn get_args() -> ArgMatches {
                     .short('d')
                     .long("dir")
                     .help("Where the the chapter will be saved at. This values defaults to \"<UserDir>/ebi/<source>/<manga>/<chapter>/\".")
+                    .takes_value(true)
             )
             .arg(
                 Arg::new("source")
@@ -49,10 +50,17 @@ pub fn get_args() -> ArgMatches {
                     .display_order(3)
                     .help("Manga chapter number to download.")
                     .max_occurrences(1)
-                    .required(true)
                     .takes_value(true),
             )
-            .group(ArgGroup::new("manga").args(&["identifier"]).required(true)),
+            .arg(
+                Arg::new("all")
+                    .long("all")
+                    .help("Select all chapters")
+                    .max_occurrences(1)
+                    .takes_value(false),
+            )
+            .group(ArgGroup::new("manga").args(&["identifier"]).required(true))
+            .group(ArgGroup::new("chapter_group").args(&["chapter", "all"]).required(true)),
     )
     .get_matches()
 }

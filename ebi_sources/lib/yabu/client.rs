@@ -45,6 +45,7 @@ pub async fn yabu_chapter_page_list(url: &str) -> ClientResult<Vec<String>> {
 
     let client = Client::builder().default_headers(headers).build().unwrap();
     let body: serde_json::Value = client.get(url).send().await?.json().await?;
+    // TODO: Check error generated when downloading vinland-saga batch with chapters [150,151,152,153,154,] 
     let chapter_list: Vec<String> = body
         .get("Miko")
         .unwrap()
