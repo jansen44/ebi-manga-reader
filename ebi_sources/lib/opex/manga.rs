@@ -2,8 +2,8 @@ use crate::chapter::Chapter;
 use crate::manga::{Manga, MangaData, MangaInfo};
 use crate::Result;
 
-use super::{OPEX_SOURCE_IDENTIFIER, OPEX_BASE_URL};
 use super::client;
+use super::{OPEX_BASE_URL, OPEX_SOURCE_IDENTIFIER};
 
 mod manga_parser {
     use scraper::{ElementRef, Html, Selector};
@@ -238,6 +238,7 @@ impl MangaData for OpexManga {
 
     async fn chapter(&self, chapter: usize) -> Result<Option<Box<dyn Chapter>>> {
         let chapters = self.chapter_list().await?;
+        let chapter = if chapter == 0 { 1 } else { chapter };
         let chapter = chapters.into_iter().find(|c| c.chapter() == chapter);
         Ok(chapter)
     }
