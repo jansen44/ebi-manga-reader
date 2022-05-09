@@ -2,7 +2,7 @@ use reqwest::header;
 use reqwest::header::HeaderMap;
 use reqwest::Client;
 
-use crate::errors::client::ClientResult;
+use crate::errors::client::{ClientError, ClientResult};
 use crate::manga::Manga;
 
 use super::manga::{YabuManga, YabuMangaBuilder};
@@ -45,11 +45,22 @@ pub async fn yabu_chapter_page_list(url: &str) -> ClientResult<Vec<String>> {
 
     let client = Client::builder().default_headers(headers).build().unwrap();
     let body: serde_json::Value = client.get(url).send().await?.json().await?;
-    // TODO: Check error generated when downloading vinland-saga batch with chapters [150,151,152,153,154,], black-clover 271
-    let chapter_list: Vec<String> = body
-        .get("Miko")
-        .unwrap()
-        .as_array()
+
+    let chapter_list = body.get("Miko");
+    if chapter_list.is_none() {
+        return Err(ClientError::InvalidRequestBody(String::from(
+            "Field not find in JSON response: \"Miko\"",
+        )));
+    }
+
+    let chapter_list = chapter_list.unwrap().as_array();
+    if chapter_list.is_none() {
+        return Err(ClientError::InvalidRequestBody(String::from(
+            "Invalid JSON response data type: expected \"array\"",
+        )));
+    }
+
+    let chapter_list: Vec<String> = chapter_list
         .unwrap()
         .into_iter()
         .map(|value| value.as_str().unwrap().to_owned())

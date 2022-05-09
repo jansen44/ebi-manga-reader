@@ -51,6 +51,7 @@ pub mod client {
 
     #[derive(Debug)]
     pub enum ClientError {
+        InvalidRequestBody(String),
         RequestError(reqwest::Error),
         RequestBodyError(reqwest::Error),
     }
@@ -58,6 +59,7 @@ pub mod client {
     impl Display for ClientError {
         fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
             match *self {
+                ClientError::InvalidRequestBody(ref message) => write!(f, "error: {message}"),
                 ClientError::RequestError(ref e) | ClientError::RequestBodyError(ref e) => {
                     write!(f, "{e}")
                 }
@@ -70,7 +72,8 @@ pub mod client {
             match *self {
                 ClientError::RequestError(ref e) | ClientError::RequestBodyError(ref e) => {
                     e.source()
-                }
+                },
+                _ => None,
             }
         }
     }
