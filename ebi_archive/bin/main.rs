@@ -52,7 +52,26 @@ async fn main() -> Result<()> {
 
     match arg_matches.subcommand() {
         Some(("sources", _)) => handle_sources(),
-        Some(("down", subargs)) => handle_down(subargs).await?,
+        Some(("down", subargs)) => {
+            let result = handle_down(subargs).await;
+            if let Err(err) = result {
+                match err {
+                    ArchiveError::SourceError(e) => match e {
+                        SourceError::InvalidSourceIdentifier => {
+                            println!("error: Invalid source identifier\n");
+                            handle_sources();
+                        },
+                        SourceError::InvalidSourceData(e) => println!("Something went wrong: {e}"),
+                        SourceError::ClientError(e) => println!("Something went wrong: {e}"),
+                        SourceError::ParserError(e) => println!("Something went wrong: {e}"),
+                    },
+                    ArchiveError::DownloadError(e) => println!("{e}"),
+                    ArchiveError::IOError(e) => println!("{e}"),
+                    ArchiveError::RequestError(e) => println!("{e}"),
+                    ArchiveError::RequestBodyError(e) => println!("{e}"),
+                }
+            }
+        },
         _ => (), // unreachable due to clap validations
     }
 

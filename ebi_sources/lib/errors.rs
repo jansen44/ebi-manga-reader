@@ -14,10 +14,10 @@ pub enum SourceError {
 impl Display for SourceError {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match *self {
-            SourceError::InvalidSourceIdentifier => write!(f, "error: Invalid source identifier"),
-            SourceError::InvalidSourceData(ref e) => write!(f, "error: Invalid source data: {e}"),
-            SourceError::ClientError(ref e) => write!(f, "client_error: {e}"),
-            SourceError::ParserError(ref e) => write!(f, "parsing_error: {:?}", e),
+            SourceError::InvalidSourceIdentifier => write!(f, "source_error: Invalid source identifier"),
+            SourceError::InvalidSourceData(ref e) => write!(f, "source_error: Invalid source data: {e}"),
+            SourceError::ClientError(ref e) => write!(f, "{e}"),
+            SourceError::ParserError(ref e) => write!(f, "{e}"),
         }
     }
 }
@@ -59,7 +59,7 @@ pub mod client {
     impl Display for ClientError {
         fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
             match *self {
-                ClientError::InvalidRequestBody(ref message) => write!(f, "error: {message}"),
+                ClientError::InvalidRequestBody(ref message) => write!(f, "client_error: {message}"),
                 ClientError::RequestError(ref e) | ClientError::RequestBodyError(ref e) => {
                     write!(f, "{e}")
                 }
@@ -72,7 +72,7 @@ pub mod client {
             match *self {
                 ClientError::RequestError(ref e) | ClientError::RequestBodyError(ref e) => {
                     e.source()
-                },
+                }
                 _ => None,
             }
         }
@@ -103,6 +103,22 @@ pub mod parser {
         MissingElement(String),
         FailedTypeConversion(String),
         InvalidParsingTarget(String),
+    }
+
+    impl std::fmt::Display for ParserError {
+        fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+            match *self {
+                ParserError::Other(ref e) => write!(f, "parser_error: {e}"),
+                ParserError::ParsingError(ref e, location) => write!(
+                    f,
+                    "error parsing at position ({}, {}): {e}",
+                    location.line, location.column
+                ),
+                ParserError::MissingElement(ref e) => write!(f, "parser_error: {e}"),
+                ParserError::FailedTypeConversion(ref e) => write!(f, "parser_error: {e}"),
+                ParserError::InvalidParsingTarget(ref e) => write!(f, "parser_error: {e}"),
+            }
+        }
     }
 
     impl<'a> From<cssparser::ParseError<'a, SelectorParseErrorKind<'a>>> for ParserError {

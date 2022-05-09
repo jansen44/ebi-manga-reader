@@ -46,17 +46,18 @@ pub async fn yabu_chapter_page_list(url: &str) -> ClientResult<Vec<String>> {
     let client = Client::builder().default_headers(headers).build().unwrap();
     let body: serde_json::Value = client.get(url).send().await?.json().await?;
 
-    let chapter_list = body.get("Miko");
-    if chapter_list.is_none() {
+    let raw_chapter_list = body.get("Miko");
+    if raw_chapter_list.is_none() {
         return Err(ClientError::InvalidRequestBody(String::from(
             "Field not find in JSON response: \"Miko\"",
         )));
     }
 
-    let chapter_list = chapter_list.unwrap().as_array();
+    let chapter_list = raw_chapter_list.clone().unwrap().as_array();
     if chapter_list.is_none() {
-        return Err(ClientError::InvalidRequestBody(String::from(
-            "Invalid JSON response data type: expected \"array\"",
+        return Err(ClientError::InvalidRequestBody(format!(
+            "Invalid JSON response data type: expected \"array\" found \"{}\"",
+            raw_chapter_list.unwrap()
         )));
     }
 
