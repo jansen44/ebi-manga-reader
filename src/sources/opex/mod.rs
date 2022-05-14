@@ -2,7 +2,7 @@ use anyhow::Result;
 
 use crate::errors::EbiError;
 use crate::sources::manga::Manga;
-use crate::sources::source::{Source, SourceData, SourceInfo};
+use crate::sources::source::{SourceData, SourceInfo, TSource};
 
 mod client;
 
@@ -19,6 +19,8 @@ pub struct OpexSource {
     pub description: String,
     pub base_url: String,
 }
+
+impl TSource for OpexSource {}
 
 impl OpexSource {
     pub fn default() -> Self {
@@ -104,5 +106,3 @@ impl SourceData for OpexSource {
         Ok(manga)
     }
 }
-
-impl Source for OpexSource {}

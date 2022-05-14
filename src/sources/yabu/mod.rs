@@ -2,7 +2,7 @@ use anyhow::Result;
 
 use crate::errors::EbiError;
 use crate::sources::manga::Manga;
-use crate::sources::source::{Source, SourceData, SourceInfo};
+use crate::sources::source::{SourceData, SourceInfo, TSource};
 
 mod client;
 
@@ -132,6 +132,8 @@ pub struct YabuSource {
     pub base_url: String,
 }
 
+impl TSource for YabuSource {}
+
 impl YabuSource {
     pub fn default() -> Self {
         Self {
@@ -203,5 +205,3 @@ impl SourceData for YabuSource {
         Ok(manga)
     }
 }
-
-impl Source for YabuSource {}
