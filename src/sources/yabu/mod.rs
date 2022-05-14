@@ -2,7 +2,7 @@ use anyhow::Result;
 
 use crate::errors::EbiError;
 use crate::sources::manga::Manga;
-use crate::sources::source::{SourceData, SourceInfo, TSource};
+use crate::sources::source::TSource;
 
 mod client;
 
@@ -49,9 +49,7 @@ mod source_parser {
         let anchor = el
             .select(&link_selector)
             .next()
-            .ok_or(EbiError::ParserMissingElement(
-                ".info-bottom a -- manga_card_title",
-            ))?;
+            .ok_or(EbiError::ParserMissingElement(".info-bottom a -- manga_card_title"))?;
         Ok(anchor.inner_html())
     }
 
@@ -132,8 +130,6 @@ pub struct YabuSource {
     pub base_url: String,
 }
 
-impl TSource for YabuSource {}
-
 impl YabuSource {
     pub fn default() -> Self {
         Self {
@@ -145,7 +141,8 @@ impl YabuSource {
     }
 }
 
-impl SourceInfo for YabuSource {
+#[async_trait::async_trait]
+impl TSource for YabuSource {
     fn identifier(&self) -> String {
         self.identifier.clone()
     }
@@ -161,10 +158,7 @@ impl SourceInfo for YabuSource {
     fn base_url(&self) -> String {
         self.base_url.clone()
     }
-}
 
-#[async_trait::async_trait]
-impl SourceData for YabuSource {
     async fn manga_list(&self) -> Result<Vec<Manga>> {
         let manga_list = client::yabu_manga_list().await?;
         Ok(manga_list)

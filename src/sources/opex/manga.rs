@@ -1,7 +1,7 @@
 use anyhow::Result;
 
 use crate::sources::chapter::Chapter;
-use crate::sources::manga::{MangaData, MangaInfo, TManga};
+use crate::sources::manga::TManga;
 
 use super::client;
 use super::{OPEX_BASE_URL, OPEX_SOURCE_IDENTIFIER};
@@ -186,9 +186,8 @@ pub struct OpexManga {
     pub url: String,
 }
 
-impl TManga for OpexManga {}
-
-impl MangaInfo for OpexManga {
+#[async_trait::async_trait]
+impl TManga for OpexManga {
     fn identifier(&self) -> String {
         self.identifier.clone()
     }
@@ -216,10 +215,7 @@ impl MangaInfo for OpexManga {
     fn source_identifier(&self) -> String {
         OPEX_SOURCE_IDENTIFIER.to_owned()
     }
-}
 
-#[async_trait::async_trait]
-impl MangaData for OpexManga {
     async fn chapter_list(&self) -> Result<Vec<Chapter>> {
         let page = client::opex_html_page(self.url.as_str()).await?;
         let chapters = manga_parser::chapter_list(self.identifier.as_str(), page.as_str())?;

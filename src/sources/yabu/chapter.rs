@@ -1,7 +1,7 @@
 use anyhow::Result;
 
 use crate::errors::EbiError;
-use crate::sources::chapter::{ChapterData, ChapterInfo, TChapter};
+use crate::sources::chapter::TChapter;
 
 use super::client;
 
@@ -62,9 +62,8 @@ pub struct YabuChapter {
     pub yabu_id: usize,
 }
 
-impl TChapter for YabuChapter {}
-
-impl ChapterInfo for YabuChapter {
+#[async_trait::async_trait]
+impl TChapter for YabuChapter {
     fn chapter(&self) -> usize {
         self.chapter
     }
@@ -84,10 +83,7 @@ impl ChapterInfo for YabuChapter {
     fn source_identifier(&self) -> String {
         YABU_SOURCE_IDENTIFIER.to_owned()
     }
-}
 
-#[async_trait::async_trait]
-impl ChapterData for YabuChapter {
     async fn page_url_list(&self) -> Result<Vec<String>> {
         let page = client::yabu_html(self.url.as_str()).await?;
         let hatsuna = page

@@ -1,7 +1,7 @@
 use anyhow::Result;
 
 use crate::sources::chapter::Chapter;
-use crate::sources::manga::{MangaData, MangaInfo, TManga};
+use crate::sources::manga::TManga;
 
 use super::client;
 use super::{YABU_BASE_URL, YABU_SOURCE_IDENTIFIER};
@@ -112,9 +112,8 @@ pub struct YabuManga {
     pub genre: Option<String>,
 }
 
-impl TManga for YabuManga {}
-
-impl MangaInfo for YabuManga {
+#[async_trait::async_trait]
+impl TManga for YabuManga {
     fn identifier(&self) -> String {
         self.identifier.clone()
     }
@@ -142,10 +141,7 @@ impl MangaInfo for YabuManga {
     fn source_identifier(&self) -> String {
         YABU_SOURCE_IDENTIFIER.to_owned()
     }
-}
 
-#[async_trait::async_trait]
-impl MangaData for YabuManga {
     async fn chapter_list(&self) -> Result<Vec<Chapter>> {
         let page = client::yabu_html(self.url.as_str()).await?;
         let chapters = manga_parser::chapter_list(self.identifier().as_str(), page.as_str())?;

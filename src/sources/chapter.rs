@@ -1,19 +1,14 @@
 use anyhow::Result;
 
-pub trait ChapterInfo {
+#[async_trait::async_trait]
+pub trait TChapter: std::marker::Send + std::marker::Sync {
     fn chapter(&self) -> usize;
     fn title(&self) -> String;
     fn url(&self) -> String;
     fn manga_identifier(&self) -> String;
     fn source_identifier(&self) -> String;
-}
-
-#[async_trait::async_trait]
-pub trait ChapterData {
     async fn page_url_list(&self) -> Result<Vec<String>>;
 }
-
-pub trait TChapter: ChapterInfo + ChapterData + std::fmt::Debug + std::marker::Send + std::marker::Sync {}
 
 pub struct Chapter {
     internal: Box<dyn TChapter>,

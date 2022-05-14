@@ -1,6 +1,6 @@
 use anyhow::Result;
 
-use crate::sources::chapter::{ChapterData, ChapterInfo, TChapter};
+use crate::sources::chapter::TChapter;
 
 use super::client;
 use super::{OPEX_BASE_URL, OPEX_SOURCE_IDENTIFIER};
@@ -59,9 +59,8 @@ pub struct OpexChapter {
     pub manga_identifier: String,
 }
 
-impl TChapter for OpexChapter {}
-
-impl ChapterInfo for OpexChapter {
+#[async_trait::async_trait]
+impl TChapter for OpexChapter {
     fn chapter(&self) -> usize {
         self.chapter
     }
@@ -81,10 +80,7 @@ impl ChapterInfo for OpexChapter {
     fn source_identifier(&self) -> String {
         OPEX_SOURCE_IDENTIFIER.to_owned()
     }
-}
 
-#[async_trait::async_trait]
-impl ChapterData for OpexChapter {
     async fn page_url_list(&self) -> Result<Vec<String>> {
         let page = client::opex_html_page(self.url.as_str()).await?;
         let pages = chapter_parser::chapter_page_list(page.as_str())?;

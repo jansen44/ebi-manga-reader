@@ -2,7 +2,7 @@ use anyhow::Result;
 
 use crate::errors::EbiError;
 use crate::sources::manga::Manga;
-use crate::sources::source::{SourceData, SourceInfo, TSource};
+use crate::sources::source::TSource;
 
 mod client;
 
@@ -20,8 +20,6 @@ pub struct OpexSource {
     pub base_url: String,
 }
 
-impl TSource for OpexSource {}
-
 impl OpexSource {
     pub fn default() -> Self {
         Self {
@@ -33,7 +31,8 @@ impl OpexSource {
     }
 }
 
-impl SourceInfo for OpexSource {
+#[async_trait::async_trait]
+impl TSource for OpexSource {
     fn identifier(&self) -> String {
         self.identifier.clone()
     }
@@ -49,10 +48,7 @@ impl SourceInfo for OpexSource {
     fn base_url(&self) -> String {
         self.base_url.clone()
     }
-}
 
-#[async_trait::async_trait]
-impl SourceData for OpexSource {
     async fn manga_list(&self) -> Result<Vec<Manga>> {
         let cover = manga::OpexMangaBuilder::new()
             .with_identifier("covers")

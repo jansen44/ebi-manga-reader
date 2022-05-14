@@ -2,15 +2,13 @@ use anyhow::Result;
 
 use super::manga::Manga;
 
-pub trait SourceInfo {
+#[async_trait::async_trait]
+pub trait TSource {
     fn identifier(&self) -> String;
     fn title(&self) -> String;
     fn description(&self) -> String;
     fn base_url(&self) -> String;
-}
 
-#[async_trait::async_trait]
-pub trait SourceData {
     async fn manga_list(&self) -> Result<Vec<Manga>>;
     async fn latest_manga(&self) -> Result<Vec<Manga>>;
     async fn popular_manga(&self) -> Result<Vec<Manga>>;
@@ -19,8 +17,6 @@ pub trait SourceData {
     async fn search_manga(&self, manga_title: &str) -> Result<Vec<Manga>>;
     async fn get_manga(&self, manga_identifier: &str) -> Result<Manga>;
 }
-
-pub trait TSource: SourceInfo + SourceData + std::fmt::Debug {}
 
 pub struct Source {
     internal: Box<dyn TSource>,

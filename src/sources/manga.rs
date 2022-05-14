@@ -2,7 +2,8 @@ use anyhow::Result;
 
 use super::chapter::Chapter;
 
-pub trait MangaInfo {
+#[async_trait::async_trait]
+pub trait TManga {
     fn identifier(&self) -> String;
     fn title(&self) -> String;
     fn cover(&self) -> String;
@@ -10,15 +11,10 @@ pub trait MangaInfo {
     fn genre(&self) -> Option<String>;
     fn description(&self) -> Option<String>;
     fn source_identifier(&self) -> String;
-}
 
-#[async_trait::async_trait]
-pub trait MangaData {
     async fn chapter_list(&self) -> Result<Vec<Chapter>>;
     async fn chapter(&self, chapter: usize) -> Result<Option<Chapter>>;
 }
-
-pub trait TManga: MangaInfo + MangaData + std::fmt::Debug {}
 
 pub struct Manga {
     internal: Box<dyn TManga>,
