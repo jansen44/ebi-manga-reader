@@ -82,10 +82,7 @@ mod manga_parser {
     }
 
     fn covers_chapter_info_from_element(element: ElementRef) -> Result<ChapterInfo> {
-        let title = element
-            .text()
-            .next()
-            .ok_or(EbiError::ParserMissingElement("text"))?;
+        let title = element.text().next().ok_or(EbiError::ParserMissingElement("text"))?;
         let title = (&title[..title.len() - 1]).to_owned();
 
         let anchor_selector = &Selector::parse("a.online").unwrap();
@@ -98,11 +95,7 @@ mod manga_parser {
         Ok((None, title, url))
     }
 
-    fn chapter_from_element<'a>(
-        manga_identifier: &'a str,
-        element: ElementRef,
-        idx: usize,
-    ) -> Result<OpexChapter> {
+    fn chapter_from_element<'a>(manga_identifier: &'a str, element: ElementRef, idx: usize) -> Result<OpexChapter> {
         let info = match manga_identifier {
             "main" => Ok(main_chapter_info_from_element(element)),
             "sbs" => Ok(sbs_chapter_info_from_element(element)),
@@ -121,7 +114,7 @@ mod manga_parser {
         })
     }
 
-    pub fn chapter_list<'a>(manga_identifier: &'a str, html_page: &str) -> Result<Vec<Box<dyn Chapter>>> {
+    pub fn chapter_list<'a>(manga_identifier: &'a str, html_page: &str) -> Result<Vec<Chapter>> {
         let scraper_html_page = Html::parse_document(html_page);
 
         let selector = chapter_list_selectors(manga_identifier);
@@ -135,7 +128,7 @@ mod manga_parser {
             .into_iter()
             .enumerate()
             .map(|(i, el)| match chapter_from_element(manga_identifier, el, i) {
-                Ok(chapter) => Ok(Box::new(chapter) as Box<dyn Chapter>),
+                Ok(chapter) => Ok(chapter.into()),
                 Err(err) => Err(err),
             })
             .collect()
@@ -227,13 +220,13 @@ impl MangaInfo for OpexManga {
 
 #[async_trait::async_trait]
 impl MangaData for OpexManga {
-    async fn chapter_list(&self) -> Result<Vec<Box<dyn Chapter>>> {
+    async fn chapter_list(&self) -> Result<Vec<Chapter>> {
         let page = client::opex_html_page(self.url.as_str()).await?;
         let chapters = manga_parser::chapter_list(self.identifier.as_str(), page.as_str())?;
         Ok(chapters)
     }
 
-    async fn chapter(&self, chapter: usize) -> Result<Option<Box<dyn Chapter>>> {
+    async fn chapter(&self, chapter: usize) -> Result<Option<Chapter>> {
         let chapters = self.chapter_list().await?;
         let chapter = match chapter {
             chapter if chapter > chapters.len() => chapters.len(),

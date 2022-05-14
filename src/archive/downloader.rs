@@ -63,17 +63,12 @@ fn download_page_job(page: String, destination: String) -> JoinHandle<Result<()>
 async fn download_single_chapter<'a>(
     source_identifier: &str,
     manga_identifier: &str,
-    chapter: &'a Box<dyn Chapter>,
+    chapter: &'a Chapter,
     destination: Option<String>,
 ) -> Result<String> {
     let pages = chapter.page_url_list().await?;
 
-    let target_dir = create_directories(
-        source_identifier,
-        manga_identifier,
-        chapter.chapter(),
-        destination,
-    )?;
+    let target_dir = create_directories(source_identifier, manga_identifier, chapter.chapter(), destination)?;
 
     let mut tasks: Vec<JoinHandle<Result<()>>> = vec![];
 
@@ -100,11 +95,7 @@ async fn download_single_chapter<'a>(
 
 const CHAPTER_BATCH_SIZE: usize = 3;
 
-pub async fn download_all_chapters(
-    source: &str,
-    manga_identifier: &str,
-    destination: Option<String>,
-) -> Result<()> {
+pub async fn download_all_chapters(source: &str, manga_identifier: &str, destination: Option<String>) -> Result<()> {
     let sources = get_available_sources();
     let source = sources.get(source).unwrap(); // TODO: better error handling
 

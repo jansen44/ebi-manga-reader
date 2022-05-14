@@ -14,8 +14,8 @@ pub trait MangaInfo {
 
 #[async_trait::async_trait]
 pub trait MangaData {
-    async fn chapter_list(&self) -> Result<Vec<Box<dyn Chapter>>>;
-    async fn chapter(&self, chapter: usize) -> Result<Option<Box<dyn Chapter>>>;
+    async fn chapter_list(&self) -> Result<Vec<Chapter>>;
+    async fn chapter(&self, chapter: usize) -> Result<Option<Chapter>>;
 }
 
 pub trait TManga: MangaInfo + MangaData + std::fmt::Debug {}
@@ -53,11 +53,11 @@ impl Manga {
         self.internal.source_identifier()
     }
 
-    pub async fn chapter_list(&self) -> Result<Vec<Box<dyn Chapter>>> {
+    pub async fn chapter_list(&self) -> Result<Vec<Chapter>> {
         self.internal.chapter_list().await
     }
 
-    pub async fn chapter(&self, chapter: usize) -> Result<Option<Box<dyn Chapter>>> {
+    pub async fn chapter(&self, chapter: usize) -> Result<Option<Chapter>> {
         self.internal.chapter(chapter).await
     }
 }

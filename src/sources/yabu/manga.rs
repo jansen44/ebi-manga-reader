@@ -13,7 +13,7 @@ mod manga_parser {
     use crate::sources::chapter::Chapter;
     use crate::sources::yabu::chapter::YabuChapterBuilder;
 
-    pub fn chapter_list(manga_identifier: &str, html_page: &str) -> Result<Vec<Box<dyn Chapter>>> {
+    pub fn chapter_list(manga_identifier: &str, html_page: &str) -> Result<Vec<Chapter>> {
         let html = Html::parse_document(html_page);
         let chapter_list_json = Selector::parse("#manga-info").unwrap();
         let chapter_list_json = html.select(&chapter_list_json).next().unwrap().inner_html();
@@ -27,7 +27,7 @@ mod manga_parser {
         let all_posts_json = page_list_json.get("allposts").unwrap();
         let all_posts_json = all_posts_json.as_array().unwrap();
 
-        let chapters: Vec<Box<dyn Chapter>> = all_posts_json
+        let chapters: Vec<Chapter> = all_posts_json
             .iter()
             .rev()
             .enumerate()
@@ -42,14 +42,13 @@ mod manga_parser {
 
                 let title = format!("{} - {}", title, num);
 
-                let chapter = YabuChapterBuilder::new()
+                YabuChapterBuilder::new()
                     .with_chapter(idx + 1)
                     .with_title(title.as_str())
                     .with_yabu_id(id)
                     .with_manga_identifier(manga_identifier)
-                    .build();
-
-                Box::new(chapter) as Box<dyn Chapter>
+                    .build()
+                    .into()
             })
             .collect();
 
@@ -147,13 +146,13 @@ impl MangaInfo for YabuManga {
 
 #[async_trait::async_trait]
 impl MangaData for YabuManga {
-    async fn chapter_list(&self) -> Result<Vec<Box<dyn Chapter>>> {
+    async fn chapter_list(&self) -> Result<Vec<Chapter>> {
         let page = client::yabu_html(self.url.as_str()).await?;
         let chapters = manga_parser::chapter_list(self.identifier().as_str(), page.as_str())?;
         Ok(chapters)
     }
 
-    async fn chapter(&self, chapter: usize) -> Result<Option<Box<dyn Chapter>>> {
+    async fn chapter(&self, chapter: usize) -> Result<Option<Chapter>> {
         let mut chapter_list = self.chapter_list().await?;
 
         let chapter = match chapter {

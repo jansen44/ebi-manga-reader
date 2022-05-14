@@ -1,6 +1,6 @@
 use anyhow::Result;
 
-use crate::sources::chapter::{Chapter, ChapterData, ChapterInfo};
+use crate::sources::chapter::{ChapterData, ChapterInfo, TChapter};
 
 use super::client;
 use super::{OPEX_BASE_URL, OPEX_SOURCE_IDENTIFIER};
@@ -34,9 +34,9 @@ mod chapter_parser {
 
         let page_list_json = serde_json::from_str::<String>(page_list_json)?;
         let page_list_json: serde_json::Value = serde_json::from_str(page_list_json.as_str())?;
-        let page_list_json = page_list_json.as_object().ok_or(EbiError::ParserError(
-            "could not get object from serde_json::Value",
-        ))?;
+        let page_list_json = page_list_json
+            .as_object()
+            .ok_or(EbiError::ParserError("could not get object from serde_json::Value"))?;
 
         let mut page_list = page_list_json
             .iter()
@@ -58,6 +58,8 @@ pub struct OpexChapter {
     pub url: String,
     pub manga_identifier: String,
 }
+
+impl TChapter for OpexChapter {}
 
 impl ChapterInfo for OpexChapter {
     fn chapter(&self) -> usize {
@@ -89,5 +91,3 @@ impl ChapterData for OpexChapter {
         Ok(pages)
     }
 }
-
-impl Chapter for OpexChapter {}

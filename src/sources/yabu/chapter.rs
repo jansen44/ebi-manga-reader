@@ -1,7 +1,7 @@
 use anyhow::Result;
 
 use crate::errors::EbiError;
-use crate::sources::chapter::{Chapter, ChapterData, ChapterInfo};
+use crate::sources::chapter::{ChapterData, ChapterInfo, TChapter};
 
 use super::client;
 
@@ -62,6 +62,8 @@ pub struct YabuChapter {
     pub yabu_id: usize,
 }
 
+impl TChapter for YabuChapter {}
+
 impl ChapterInfo for YabuChapter {
     fn chapter(&self) -> usize {
         self.chapter
@@ -108,5 +110,3 @@ impl ChapterData for YabuChapter {
         Ok(chapter_list)
     }
 }
-
-impl Chapter for YabuChapter {}
