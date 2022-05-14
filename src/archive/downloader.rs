@@ -1,6 +1,4 @@
-use crate::errors::download::DownloadError;
-use crate::Result;
-use ebi_sources::get_available_sources;
+use anyhow::Result;
 use futures::future::join_all;
 use reqwest;
 use std::fs;
@@ -8,6 +6,9 @@ use std::fs::File;
 use std::io;
 use std::io::Cursor;
 use tokio::task::JoinHandle;
+
+use crate::sources::chapter::Chapter;
+use crate::sources::get_available_sources;
 
 fn default_target_base_path() -> String {
     let home = std::env::var("HOME").unwrap(); // TODO: handle this error and "Windows" later
@@ -32,7 +33,7 @@ fn create_directories(
     Ok(destination)
 }
 
-async fn download_page(page_url: &str, destination: &str) -> Result<(), DownloadError> {
+async fn download_page(page_url: &str, destination: &str) -> Result<()> {
     let page_url = page_url.to_owned();
     let destination = destination.to_owned();
 
@@ -45,23 +46,24 @@ async fn download_page(page_url: &str, destination: &str) -> Result<(), Download
     Ok(())
 }
 
-fn download_page_job(page: String, destination: String) -> JoinHandle<Result<(), DownloadError>> {
+fn download_page_job(page: String, destination: String) -> JoinHandle<Result<()>> {
     tokio::spawn(async move {
         let downloaded = download_page(page.as_str(), destination.as_str()).await;
-        match downloaded {
-            Err(err) => Err(DownloadError::GenericError(format!(
-                "ERROR downloading {}: {}",
-                page, err
-            ))),
-            _ => Ok(()),
-        }
+        Ok(downloaded.unwrap())
+        // match downloaded {
+        //     Err(err) => Err(DownloadError::GenericError(format!(
+        //         "ERROR downloading {}: {}",
+        //         page, err
+        //     ))),
+        //     _ => Ok(()),
+        // }
     })
 }
 
 async fn download_single_chapter<'a>(
     source_identifier: &str,
     manga_identifier: &str,
-    chapter: &'a Box<dyn ebi_sources::chapter::Chapter>,
+    chapter: &'a Box<dyn Chapter>,
     destination: Option<String>,
 ) -> Result<String> {
     let pages = chapter.page_url_list().await?;
@@ -73,7 +75,7 @@ async fn download_single_chapter<'a>(
         destination,
     )?;
 
-    let mut tasks: Vec<JoinHandle<Result<(), DownloadError>>> = vec![];
+    let mut tasks: Vec<JoinHandle<Result<()>>> = vec![];
 
     for (index, page) in pages.iter().enumerate() {
         let file_extension = *page
@@ -106,12 +108,11 @@ pub async fn download_all_chapters(
     let sources = get_available_sources();
     let source = sources.get(source).unwrap(); // TODO: better error handling
 
-    let manga = source.get_manga(manga_identifier).await?.unwrap();
+    let manga = source.get_manga(manga_identifier).await?;
     let mut chapters = manga.chapter_list().await?;
 
     while chapters.len() > 0 {
-        let mut tasks: Vec<JoinHandle<Result<String, crate::errors::ArchiveError>>> =
-            Vec::with_capacity(CHAPTER_BATCH_SIZE); // maybe thread better??
+        let mut tasks: Vec<JoinHandle<Result<String>>> = Vec::with_capacity(CHAPTER_BATCH_SIZE);
 
         for i in 0..CHAPTER_BATCH_SIZE {
             if i >= chapters.len() {
@@ -162,7 +163,7 @@ pub async fn download_chapter(
     let sources = get_available_sources();
     let source = sources.get(source).unwrap(); // TODO: better error handling
 
-    let manga = source.get_manga(manga_identifier).await?.unwrap();
+    let manga = source.get_manga(manga_identifier).await?;
 
     let chapter = manga.chapter(chapter_number).await?.unwrap();
 
@@ -173,7 +174,7 @@ pub async fn download_chapter(
         destination,
     )
     .await?;
-    
+
     println!("Done. Downloaded to \"{destination}\", have a good read!");
     Ok(())
 }

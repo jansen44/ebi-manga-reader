@@ -1,9 +1,11 @@
+use anyhow::Result;
+
 use reqwest::header;
 use reqwest::header::HeaderMap;
 use reqwest::Client;
 
-use crate::errors::client::{ClientError, ClientResult};
-use crate::manga::Manga;
+use crate::errors::EbiError;
+use crate::sources::manga::Manga;
 
 use super::manga::{YabuManga, YabuMangaBuilder};
 use super::YABU_BASE_URL;
@@ -17,7 +19,7 @@ const HTML_ACCEPT_HEADER: &str =
     "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,*/*;q=0.8";
 const HTML_ACCEPT_LANGUAGE_HEADER: &str = "pt-BR,pt;q=0.8,en-US;q=0.5,en;q=0.3";
 
-pub async fn yabu_manga_list() -> ClientResult<Vec<Box<dyn Manga>>> {
+pub async fn yabu_manga_list() -> Result<Vec<Box<dyn Manga>>> {
     let url = format!("{}{}", YABU_BASE_URL, API_MANGA_LIST_PATH);
 
     let mut headers = HeaderMap::new();
@@ -34,7 +36,7 @@ pub async fn yabu_manga_list() -> ClientResult<Vec<Box<dyn Manga>>> {
     Ok(body.into())
 }
 
-pub async fn yabu_chapter_page_list(url: &str) -> ClientResult<Vec<String>> {
+pub async fn yabu_chapter_page_list(url: &str) -> Result<Vec<String>> {
     let mut headers = HeaderMap::new();
     headers.insert(header::ACCEPT, API_ACCEPT_HEADER.parse().unwrap());
     headers.insert(header::REFERER, API_REFERER_HEADER.parse().unwrap());
@@ -46,23 +48,16 @@ pub async fn yabu_chapter_page_list(url: &str) -> ClientResult<Vec<String>> {
     let client = Client::builder().default_headers(headers).build().unwrap();
     let body: serde_json::Value = client.get(url).send().await?.json().await?;
 
-    let raw_chapter_list = body.get("Miko");
-    if raw_chapter_list.is_none() {
-        return Err(ClientError::InvalidRequestBody(String::from(
-            "Field not find in JSON response: \"Miko\"",
-        )));
-    }
+    let raw_chapter_list = body.get("Miko").ok_or(EbiError::ClientInvalidRequestBody(
+        "Field not find in JSON response: \"Miko\"",
+    ))?;
 
-    let chapter_list = raw_chapter_list.clone().unwrap().as_array();
-    if chapter_list.is_none() {
-        return Err(ClientError::InvalidRequestBody(format!(
-            "Invalid JSON response data type: expected \"array\" found \"{}\"",
-            raw_chapter_list.unwrap()
-        )));
-    }
+    let chapter_list = raw_chapter_list.clone();
+    let chapter_list = chapter_list.as_array().ok_or(EbiError::ClientInvalidRequestBody(
+        "Invalid JSON response data type: expected \"array\"",
+    ))?;
 
     let chapter_list: Vec<String> = chapter_list
-        .unwrap()
         .into_iter()
         .map(|value| value.as_str().unwrap().to_owned())
         .collect();
@@ -70,7 +65,7 @@ pub async fn yabu_chapter_page_list(url: &str) -> ClientResult<Vec<String>> {
     Ok(chapter_list)
 }
 
-pub async fn yabu_homepage_html() -> ClientResult<String> {
+pub async fn yabu_homepage_html() -> Result<String> {
     let url = YABU_BASE_URL.to_owned();
 
     let mut headers = HeaderMap::new();
@@ -86,7 +81,7 @@ pub async fn yabu_homepage_html() -> ClientResult<String> {
     Ok(body)
 }
 
-pub async fn yabu_html(url: &str) -> ClientResult<String> {
+pub async fn yabu_html(url: &str) -> Result<String> {
     let mut headers = HeaderMap::new();
     headers.insert(
         header::ACCEPT_LANGUAGE,

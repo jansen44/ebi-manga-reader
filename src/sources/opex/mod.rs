@@ -1,6 +1,8 @@
-use crate::manga::Manga;
-use crate::source::{Source, SourceData, SourceInfo};
-use crate::Result;
+use anyhow::Result;
+
+use crate::errors::EbiError;
+use crate::sources::manga::Manga;
+use crate::sources::source::{Source, SourceData, SourceInfo};
 
 mod client;
 
@@ -93,11 +95,12 @@ impl SourceData for OpexSource {
         self.manga_list().await
     }
 
-    async fn get_manga(&self, manga_identifier: &str) -> Result<Option<Box<dyn Manga>>> {
+    async fn get_manga(&self, manga_identifier: &str) -> Result<Box<dyn Manga>> {
         let manga_list = self.manga_list().await?;
         let manga = manga_list
             .into_iter()
-            .find(|m| m.identifier() == manga_identifier);
+            .find(|m| m.identifier() == manga_identifier)
+            .ok_or(EbiError::InvalidMangaIdentifier)?;
         Ok(manga)
     }
 }

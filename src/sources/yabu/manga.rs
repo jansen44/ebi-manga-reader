@@ -1,23 +1,21 @@
-use crate::chapter::Chapter;
-use crate::manga::{Manga, MangaData, MangaInfo};
-use crate::Result;
+use anyhow::Result;
+
+use crate::sources::chapter::Chapter;
+use crate::sources::manga::{Manga, MangaData, MangaInfo};
 
 use super::client;
 use super::{YABU_BASE_URL, YABU_SOURCE_IDENTIFIER};
 
 mod manga_parser {
+    use anyhow::Result;
     use scraper::{Html, Selector};
 
-    use crate::chapter::Chapter;
-    use crate::errors::parser::ParserResult;
-    use crate::yabu::chapter::YabuChapterBuilder;
+    use crate::sources::chapter::Chapter;
+    use crate::sources::yabu::chapter::YabuChapterBuilder;
 
-    pub fn chapter_list(
-        manga_identifier: &str,
-        html_page: &str,
-    ) -> ParserResult<Vec<Box<dyn Chapter>>> {
+    pub fn chapter_list(manga_identifier: &str, html_page: &str) -> Result<Vec<Box<dyn Chapter>>> {
         let html = Html::parse_document(html_page);
-        let chapter_list_json = Selector::parse("#manga-info")?;
+        let chapter_list_json = Selector::parse("#manga-info").unwrap();
         let chapter_list_json = html.select(&chapter_list_json).next().unwrap().inner_html();
 
         let page_list_json = serde_json::from_str::<serde_json::Value>(chapter_list_json.as_str())?;
@@ -69,9 +67,7 @@ pub struct YabuMangaBuilder {
 
 impl YabuMangaBuilder {
     pub fn new() -> Self {
-        Self {
-            ..Default::default()
-        }
+        Self { ..Default::default() }
     }
 
     pub fn with_identifier(mut self, identifier: &str) -> Self {

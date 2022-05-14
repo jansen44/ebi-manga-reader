@@ -1,5 +1,6 @@
-use crate::manga;
-use crate::Result;
+use anyhow::Result;
+
+use super::manga;
 
 pub trait SourceInfo {
     fn identifier(&self) -> String;
@@ -16,7 +17,7 @@ pub trait SourceData {
     async fn hot_manga(&self) -> Result<Vec<Box<dyn manga::Manga>>>;
 
     async fn search_manga(&self, manga_title: &str) -> Result<Vec<Box<dyn manga::Manga>>>;
-    async fn get_manga(&self, manga_identifier: &str) -> Result<Option<Box<dyn manga::Manga>>>;
+    async fn get_manga(&self, manga_identifier: &str) -> Result<Box<dyn manga::Manga>>;
 }
 
 pub trait Source: SourceInfo + SourceData + std::fmt::Debug {}

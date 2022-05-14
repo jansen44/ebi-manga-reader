@@ -12,6 +12,12 @@ dependencies = [
 ]
 
 [[package]]
+name = "anyhow"
+version = "1.0.57"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "08f9b8508dccb7687a1d6c4ce66b2b0ecef467c94667de27d8d7fe1f8d2a9cdc"
+
+[[package]]
 name = "async-trait"
 version = "0.1.53"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -83,9 +89,9 @@ checksum = "baf1de4339761588bc0619e3cbc0120ee582ebb74b53b4efbf79117bd2da40fd"
 
 [[package]]
 name = "clap"
-version = "3.1.17"
+version = "3.1.18"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "47582c09be7c8b32c0ab3a6181825ababb713fde6fff20fc573a3870dd45c6a0"
+checksum = "d2dbdf4bdacb33466e854ce889eee8dfd5729abf7ccd7664d0a2d60cd384440b"
 dependencies = [
  "atty",
  "bitflags",
@@ -186,26 +192,11 @@ dependencies = [
 name = "ebi"
 version = "0.1.0"
 dependencies = [
- "ebi_sources",
-]
-
-[[package]]
-name = "ebi_archive"
-version = "0.1.0"
-dependencies = [
- "clap",
- "ebi_sources",
- "futures",
- "reqwest",
- "tokio",
-]
-
-[[package]]
-name = "ebi_sources"
-version = "0.1.0"
-dependencies = [
+ "anyhow",
  "async-trait",
+ "clap",
  "cssparser",
+ "futures",
  "regex",
  "reqwest",
  "scraper",

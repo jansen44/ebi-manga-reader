@@ -1,6 +1,7 @@
-use crate::chapter::{Chapter, ChapterData, ChapterInfo};
-use crate::errors::SourceError;
-use crate::Result;
+use anyhow::Result;
+
+use crate::errors::EbiError;
+use crate::sources::chapter::{Chapter, ChapterData, ChapterInfo};
 
 use super::client;
 
@@ -16,9 +17,7 @@ pub struct YabuChapterBuilder {
 
 impl YabuChapterBuilder {
     pub fn new() -> Self {
-        Self {
-            ..Default::default()
-        }
+        Self { ..Default::default() }
     }
 
     pub fn with_chapter(mut self, chapter: usize) -> Self {
@@ -92,19 +91,12 @@ impl ChapterData for YabuChapter {
         let hatsuna = page
             .split("var hatsuna = ")
             .nth(1)
-            .unwrap()
+            .ok_or(EbiError::ParserError("hatsuna not set properly"))?
             .split(";")
             .nth(0)
-            .unwrap();
+            .ok_or(EbiError::ParserError("no comma after hatsuna"))?;
 
-        let hatsuna: usize = match hatsuna.parse() {
-            Ok(hatsuna) => hatsuna,
-            Err(_) => {
-                return Err(SourceError::InvalidSourceData(String::from(
-                    "Invalid Hatsuna for manga chapter",
-                )))
-            }
-        };
+        let hatsuna: usize = hatsuna.parse()?;
 
         let api_url = format!(
             "{}/chapter.php?id={}&hatsuna={}&cachebuster=0",

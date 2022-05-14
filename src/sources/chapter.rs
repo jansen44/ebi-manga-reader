@@ -1,4 +1,4 @@
-use crate::Result;
+use anyhow::Result;
 
 pub trait ChapterInfo {
     fn chapter(&self) -> usize;
