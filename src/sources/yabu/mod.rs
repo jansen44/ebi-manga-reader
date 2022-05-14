@@ -90,21 +90,21 @@ mod source_parser {
         Ok(manga)
     }
 
-    fn manga_list_from_carousel(element: ElementRef) -> Result<Vec<Box<dyn Manga>>> {
+    fn manga_list_from_carousel(element: ElementRef) -> Result<Vec<Manga>> {
         let manga_card_selector = Selector::parse(".manga-card").unwrap();
         let manga_card_iter = element.select(&manga_card_selector);
 
         let manga_list = manga_card_iter
             .map(|card| match manga_from_card(card) {
-                Ok(manga) => Ok(Box::new(manga) as Box<dyn Manga>),
+                Ok(manga) => Ok(manga.into()),
                 Err(err) => Err(err),
             })
-            .collect::<Result<Vec<Box<dyn Manga>>>>();
+            .collect::<Result<Vec<Manga>>>();
 
         manga_list
     }
 
-    fn manga_list_from_carousel_at(position: usize, html: Html) -> Result<Vec<Box<dyn Manga>>> {
+    fn manga_list_from_carousel_at(position: usize, html: Html) -> Result<Vec<Manga>> {
         let selector = Selector::parse("#main .carousel").unwrap();
         let carousel = html
             .select(&selector)
@@ -113,12 +113,12 @@ mod source_parser {
         manga_list_from_carousel(carousel)
     }
 
-    pub fn latest_manga_list(yabu_homepage_html: &str) -> Result<Vec<Box<dyn Manga>>> {
+    pub fn latest_manga_list(yabu_homepage_html: &str) -> Result<Vec<Manga>> {
         let html = Html::parse_document(yabu_homepage_html);
         manga_list_from_carousel_at(LATEST_MANGA_CAROUSEL_POSITION, html)
     }
 
-    pub fn popular_manga_list(yabu_homepage_html: &str) -> Result<Vec<Box<dyn Manga>>> {
+    pub fn popular_manga_list(yabu_homepage_html: &str) -> Result<Vec<Manga>> {
         let html = Html::parse_document(yabu_homepage_html);
         manga_list_from_carousel_at(POPULAR_MANGA_CAROUSEL_POSITION, html)
     }
@@ -165,28 +165,28 @@ impl SourceInfo for YabuSource {
 
 #[async_trait::async_trait]
 impl SourceData for YabuSource {
-    async fn manga_list(&self) -> Result<Vec<Box<dyn Manga>>> {
+    async fn manga_list(&self) -> Result<Vec<Manga>> {
         let manga_list = client::yabu_manga_list().await?;
         Ok(manga_list)
     }
 
-    async fn latest_manga(&self) -> Result<Vec<Box<dyn Manga>>> {
+    async fn latest_manga(&self) -> Result<Vec<Manga>> {
         let html_page = client::yabu_homepage_html().await?;
         let manga_list = source_parser::latest_manga_list(html_page.as_str())?;
         Ok(manga_list)
     }
 
-    async fn popular_manga(&self) -> Result<Vec<Box<dyn Manga>>> {
+    async fn popular_manga(&self) -> Result<Vec<Manga>> {
         let html_page = client::yabu_homepage_html().await?;
         let manga_list = source_parser::popular_manga_list(html_page.as_str())?;
         Ok(manga_list)
     }
 
-    async fn hot_manga(&self) -> Result<Vec<Box<dyn Manga>>> {
+    async fn hot_manga(&self) -> Result<Vec<Manga>> {
         self.popular_manga().await
     }
 
-    async fn search_manga(&self, manga_title: &str) -> Result<Vec<Box<dyn Manga>>> {
+    async fn search_manga(&self, manga_title: &str) -> Result<Vec<Manga>> {
         let full_list = self.manga_list().await?;
         let reg = regex::Regex::new(manga_title.to_uppercase().as_str()).unwrap();
 
@@ -196,7 +196,7 @@ impl SourceData for YabuSource {
             .collect())
     }
 
-    async fn get_manga(&self, manga_identifier: &str) -> Result<Box<dyn Manga>> {
+    async fn get_manga(&self, manga_identifier: &str) -> Result<Manga> {
         let full_list = self.manga_list().await?;
         let manga = full_list
             .into_iter()

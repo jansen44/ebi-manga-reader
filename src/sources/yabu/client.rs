@@ -19,7 +19,7 @@ const HTML_ACCEPT_HEADER: &str =
     "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,*/*;q=0.8";
 const HTML_ACCEPT_LANGUAGE_HEADER: &str = "pt-BR,pt;q=0.8,en-US;q=0.5,en;q=0.3";
 
-pub async fn yabu_manga_list() -> Result<Vec<Box<dyn Manga>>> {
+pub async fn yabu_manga_list() -> Result<Vec<Manga>> {
     let url = format!("{}{}", YABU_BASE_URL, API_MANGA_LIST_PATH);
 
     let mut headers = HeaderMap::new();
@@ -130,13 +130,13 @@ impl From<MangaListResponse> for Vec<MangaResponse> {
     }
 }
 
-impl From<MangaListResponse> for Vec<Box<dyn Manga>> {
+impl From<MangaListResponse> for Vec<Manga> {
     fn from(manga_list: MangaListResponse) -> Self {
         let manga_list: Vec<MangaResponse> = manga_list.into();
 
         manga_list
             .iter()
-            .map(|m| Box::new(YabuManga::from(m)) as Box<dyn Manga>)
-            .collect::<Vec<Box<dyn Manga>>>()
+            .map(|m| YabuManga::from(m).into())
+            .collect::<Vec<Manga>>()
     }
 }

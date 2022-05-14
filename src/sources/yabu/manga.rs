@@ -1,7 +1,7 @@
 use anyhow::Result;
 
 use crate::sources::chapter::Chapter;
-use crate::sources::manga::{Manga, MangaData, MangaInfo};
+use crate::sources::manga::{MangaData, MangaInfo, TManga};
 
 use super::client;
 use super::{YABU_BASE_URL, YABU_SOURCE_IDENTIFIER};
@@ -113,6 +113,8 @@ pub struct YabuManga {
     pub genre: Option<String>,
 }
 
+impl TManga for YabuManga {}
+
 impl MangaInfo for YabuManga {
     fn identifier(&self) -> String {
         self.identifier.clone()
@@ -164,5 +166,3 @@ impl MangaData for YabuManga {
         Ok(Some(chapter))
     }
 }
-
-impl Manga for YabuManga {}

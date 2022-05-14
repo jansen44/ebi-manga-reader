@@ -1,6 +1,6 @@
 use anyhow::Result;
 
-use super::manga;
+use super::manga::Manga;
 
 pub trait SourceInfo {
     fn identifier(&self) -> String;
@@ -11,19 +11,19 @@ pub trait SourceInfo {
 
 #[async_trait::async_trait]
 pub trait SourceData {
-    async fn manga_list(&self) -> Result<Vec<Box<dyn manga::Manga>>>;
-    async fn latest_manga(&self) -> Result<Vec<Box<dyn manga::Manga>>>;
-    async fn popular_manga(&self) -> Result<Vec<Box<dyn manga::Manga>>>;
-    async fn hot_manga(&self) -> Result<Vec<Box<dyn manga::Manga>>>;
+    async fn manga_list(&self) -> Result<Vec<Manga>>;
+    async fn latest_manga(&self) -> Result<Vec<Manga>>;
+    async fn popular_manga(&self) -> Result<Vec<Manga>>;
+    async fn hot_manga(&self) -> Result<Vec<Manga>>;
 
-    async fn search_manga(&self, manga_title: &str) -> Result<Vec<Box<dyn manga::Manga>>>;
-    async fn get_manga(&self, manga_identifier: &str) -> Result<Box<dyn manga::Manga>>;
+    async fn search_manga(&self, manga_title: &str) -> Result<Vec<Manga>>;
+    async fn get_manga(&self, manga_identifier: &str) -> Result<Manga>;
 }
 
 pub trait TSource: SourceInfo + SourceData + std::fmt::Debug {}
 
 pub struct Source {
-    pub internal: Box<dyn TSource>,
+    internal: Box<dyn TSource>,
 }
 
 impl Source {
@@ -43,27 +43,27 @@ impl Source {
         self.internal.base_url()
     }
 
-    pub async fn _manga_list(&self) -> Result<Vec<Box<dyn manga::Manga>>> {
+    pub async fn _manga_list(&self) -> Result<Vec<Manga>> {
         self.internal.manga_list().await
     }
 
-    pub async fn _latest_manga(&self) -> Result<Vec<Box<dyn manga::Manga>>> {
+    pub async fn _latest_manga(&self) -> Result<Vec<Manga>> {
         self.internal.latest_manga().await
     }
 
-    pub async fn _popular_manga(&self) -> Result<Vec<Box<dyn manga::Manga>>> {
+    pub async fn _popular_manga(&self) -> Result<Vec<Manga>> {
         self.internal.popular_manga().await
     }
 
-    pub async fn _hot_manga(&self) -> Result<Vec<Box<dyn manga::Manga>>> {
+    pub async fn _hot_manga(&self) -> Result<Vec<Manga>> {
         self.internal.hot_manga().await
     }
 
-    pub async fn _search_manga(&self, manga_title: &str) -> Result<Vec<Box<dyn manga::Manga>>> {
+    pub async fn _search_manga(&self, manga_title: &str) -> Result<Vec<Manga>> {
         self.internal.search_manga(manga_title).await
     }
 
-    pub async fn get_manga(&self, manga_identifier: &str) -> Result<Box<dyn manga::Manga>> {
+    pub async fn get_manga(&self, manga_identifier: &str) -> Result<Manga> {
         self.internal.get_manga(manga_identifier).await
     }
 }
